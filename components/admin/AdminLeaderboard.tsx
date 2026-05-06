@@ -58,7 +58,8 @@ const AdminLeaderboard: React.FC = () => {
                                             {player.level}
                                         </td>
                                         <td className="p-4 text-right font-mono text-blue-400 font-bold">
-                                            {player.points.toLocaleString()}
+                                            <div>{(player.points || 0).toLocaleString()}</div>
+                                            <div className="text-[10px] text-slate-500 font-normal">{(player.xp || 0).toLocaleString()} XP</div>
                                         </td>
                                         <td className="p-4 text-center text-slate-400">
                                             {player.solvedPuzzleIds.length}

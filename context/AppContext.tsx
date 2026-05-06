@@ -105,10 +105,23 @@ const appReducer = (state: AppState, action: Action): AppState => {
                 achievements: action.payload.achievements,
             };
         case 'LOGIN_SUCCESS':
+            // Only change view if current view is login or undefined to prevent redirect from active screens
+            const shouldChangeView = state.view === 'login' || (state.user === null && state.view === 'player_dashboard');
+            const updatedUser = action.payload;
+            
+            // Re-sync the player in the players list if it exists
+            const playerExists = state.players.some(p => p.id === updatedUser.id);
+            const updatedPlayers = playerExists
+                ? state.players.map(p => p.id === updatedUser.id ? updatedUser : p)
+                : [...state.players, updatedUser];
+
             return {
                 ...state,
-                user: action.payload,
-                view: action.payload.role === 'admin' ? 'admin_dashboard' : 'player_dashboard',
+                user: updatedUser,
+                players: updatedPlayers,
+                view: shouldChangeView 
+                    ? (updatedUser.role === 'admin' ? 'admin_dashboard' : 'player_dashboard') 
+                    : state.view,
                 adminView: 'main',
             };
         case 'LOGOUT':
@@ -162,7 +175,7 @@ const appReducer = (state: AppState, action: Action): AppState => {
         case 'ADD_TOAST':
             return {
                 ...state,
-                toasts: [...state.toasts, { ...action.payload, id: Date.now() }],
+                toasts: [...state.toasts, { ...action.payload, id: Math.random() * 999999 + Date.now() }],
             };
         case 'REMOVE_TOAST':
             return {
@@ -319,32 +332,51 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
         const currentTotalXp = Auth.calculateTotalXp(state.user.level, state.user.xp);
         const newTotalXp = currentTotalXp + xpValue;
+        const { level: newLevel, xpInLevel: newXpInLevel, xpToNextLevel: newXpToNextLevel } = Auth.calculateLevel(newTotalXp);
 
-        const updatedUser = {
+        const updatedUserBase = {
             ...state.user,
-            points: state.user.points + points,
-            xp: newTotalXp,
+            points: (state.user.points || 0) + points,
+            xp: newXpInLevel,
+            level: newLevel,
+            xpToNextLevel: newXpToNextLevel,
             solvedPuzzleIds: [...state.user.solvedPuzzleIds, puzzleId],
         };
         
         // Check for new achievements
-        const earnedAchievements = AchievementService.checkAchievements(updatedUser, state.achievements);
+        const earnedAchievements = AchievementService.checkAchievements(updatedUserBase, state.achievements);
+        const finalUpdatedUser = { ...updatedUserBase };
+
         if (earnedAchievements.length > 0) {
-            updatedUser.achievements = [
-                ...updatedUser.achievements,
+            finalUpdatedUser.achievements = [
+                ...updatedUserBase.achievements,
                 ...earnedAchievements.map(a => a.id)
             ];
-            earnedAchievements.forEach(ach => {
-                addToast(`Achievement Unlocked: ${ach.name}! 🎉`);
+            // Unique set to prevent any DB constraint issues
+            finalUpdatedUser.achievements = Array.from(new Set(finalUpdatedUser.achievements));
+
+            earnedAchievements.forEach((ach, index) => {
+                setTimeout(() => {
+                    addToast(`Achievement Unlocked: ${ach.name}! 🎉`, 'success');
+                }, index * 150);
             });
         }
 
-        await Auth.updateUser(updatedUser);
-        const freshUser = await Auth.getLoggedInUser();
-        if (freshUser) {
-            dispatch({ type: 'LOGIN_SUCCESS', payload: freshUser });
+        try {
+            await Auth.updateUser(finalUpdatedUser);
+            // Update local state immediately for responsiveness
+            dispatch({ type: 'LOGIN_SUCCESS', payload: finalUpdatedUser });
+            
+            // Optionally refresh players list for leaderboard
             const players = await Auth.getPlayers();
-            dispatch({ type: 'INITIALIZE_DATA', payload: { ...state, players, puzzles: state.puzzles, achievements: state.achievements } });
+            dispatch({ type: 'INITIALIZE_DATA', payload: { puzzles: state.puzzles, players, achievements: state.achievements } });
+            
+            if (newLevel > state.user.level) {
+                addToast(`Level Up! You are now level ${newLevel}! 🎊`, 'success');
+            }
+        } catch (error) {
+            console.error('Failed to update user after puzzle completion:', error);
+            addToast('Correct, but failed to save progress. Please try again.', 'error');
         }
     };
 

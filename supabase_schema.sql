@@ -19,6 +19,7 @@ ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS xp INTEGER DEFAULT 0;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS level INTEGER DEFAULT 1;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS solved_puzzle_ids TEXT[] DEFAULT '{}';
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS achievement_ids TEXT[] DEFAULT '{}';
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now());
 
 -- Cleanup legacy table if it exists
 DROP TABLE IF EXISTS public.solved_puzzles CASCADE;
@@ -94,7 +95,13 @@ VALUES
 ('js-1', 'Array Sum', 'Easy', 10, 150, 'Return the sum of all elements in the array.', 'const sum = (arr) => arr.reduce((a, b) => a + b, 0);\nconsole.log(sum([1, 2, 3]));', '6', 'Arrays'),
 ('js-2', 'Filter Even', 'Easy', 15, 200, 'Filter even numbers from an array.', 'const evens = (arr) => arr.filter(x => x % 2 === 0);\nconsole.log(evens([1, 2, 3, 4]).length);', '2', 'Arrays'),
 ('js-3', 'Async Wait', 'Medium', 30, 450, 'What is logged by this async function?', 'async function test() {\n  const p = Promise.resolve(10);\n  console.log(await p);\n}\ntest();', '10', 'Async'),
-('js-4', 'Object Keys', 'Easy', 10, 150, 'Count the number of keys in the object.', 'const obj = { a: 1, b: 2, c: 3 };\nconsole.log(Object.keys(obj).length);', '3', 'Objects');
+('js-4', 'Object Keys', 'Easy', 10, 150, 'Count the number of keys in the object.', 'const obj = { a: 1, b: 2, c: 3 };\nconsole.log(Object.keys(obj).length);', '3', 'Objects'),
+('js-5', 'String Reverse', 'Easy', 10, 150, 'Reverse the given string.', 'const rev = (str) => str.split("").reverse().join("");\nconsole.log(rev("hello"));', 'olleh', 'Strings'),
+('js-6', 'Palindrome Check', 'Easy', 15, 200, 'Check if the string is a palindrome. Output "true" or "false".', 'const isPal = (s) => s === s.split("").reverse().join("");\nconsole.log(isPal("racecar"));', 'true', 'Strings'),
+('js-7', 'FizzBuzz Logic', 'Easy', 10, 150, 'What is the 15th element of FizzBuzz (starting from 1)? (Fizz, Buzz, or FizzBuzz?)', 'function fizzBuzz(n) {\n  if (n % 15 === 0) return "FizzBuzz";\n  if (n % 3 === 0) return "Fizz";\n  if (n % 5 === 0) return "Buzz";\n  return n;\n}\nconsole.log(fizzBuzz(15));', 'FizzBuzz', 'Logic'),
+('js-8', 'Fibonacci Sequence', 'Medium', 25, 400, 'What is the 6th Fibonacci number (starting from 0, 1, 1...)?', 'function fib(n) {\n  if (n <= 1) return n;\n  return fib(n-1) + fib(n-2);\n}\nconsole.log(fib(5));', '5', 'Logic'),
+('js-9', 'Multiple Decisions', 'Medium', 20, 300, 'What value does this logic return?', 'const x = 10; const y = 5;\nconsole.log(x > y ? (y * 2 === x ? "match" : "no") : "low");', 'match', 'Logic'),
+('js-10', 'Array Map', 'Easy', 10, 150, 'Multiply each element by 2 and return sum.', 'const arr = [1, 2, 3];\nconst result = arr.map(x => x * 2).reduce((a, b) => a + b, 0);\nconsole.log(result);', '12', 'Arrays');
 
 INSERT INTO public.achievements (id, name, description, icon, required_puzzles)
 VALUES 

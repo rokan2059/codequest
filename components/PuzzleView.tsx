@@ -50,13 +50,16 @@ const PuzzleView: React.FC<PuzzleViewProps> = ({ puzzle }) => {
                 </button>
                 <div className="flex justify-between items-center">
                     <h1 className="text-3xl font-bold text-gray-100">{puzzle.title}</h1>
-                    <div className="flex items-center gap-4">
+                    <div className="flex flex-col items-end gap-1">
                         <span className={`px-3 py-1 text-sm font-semibold rounded-full ${
                             puzzle.difficulty === 'Easy' ? 'bg-green-500/20 text-green-300' :
                             puzzle.difficulty === 'Medium' ? 'bg-yellow-500/20 text-yellow-300' :
                             'bg-red-500/20 text-red-300'
                         }`}>{puzzle.difficulty}</span>
-                        <span className="text-lg font-bold text-yellow-400">{puzzle.points} Points • {puzzle.xp} XP</span>
+                        <div className="flex items-center gap-3">
+                            <span className="text-sm font-bold text-yellow-400">◈ {puzzle.points} Points</span>
+                            <span className="text-sm font-bold text-blue-400">⚡ {puzzle.xp} XP</span>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -109,7 +112,7 @@ const PuzzleView: React.FC<PuzzleViewProps> = ({ puzzle }) => {
                         className="mt-6 p-4 rounded-lg border bg-secondary/20 border-secondary text-green-200"
                     >
                         <h3 className="font-bold text-lg mb-2">Correct! 🎉</h3>
-                        <p>{isAlreadySolved ? "Great job solving it again!" : `You earned ${puzzle.points} Points and ${puzzle.xp} XP. Your profile has been updated.`}</p>
+                        <p>{isAlreadySolved ? "Great job solving it again! You have already claimed the rewards for this puzzle." : `Success! You earned +${puzzle.points} Points and +${puzzle.xp} XP. Your profile has been updated.`}</p>
                         
                         <div className="flex gap-3 mt-4">
                             <button onClick={onBack} className="bg-primary hover:bg-red-900 text-white font-bold py-2 px-4 rounded-lg transition-colors">

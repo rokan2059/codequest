@@ -102,7 +102,7 @@ export const signup = async (email: string, password: string): Promise<{ success
 
 export const resetPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: window.location.origin,
     });
     if (error) throw error;
     return { success: true, message: 'Password reset link sent to your email.' };
@@ -157,8 +157,7 @@ export const updateUser = async (updatedUser: User) => {
             xp: updatedUser.xp,
             level: levelInfo.level,
             solved_puzzle_ids: updatedUser.solvedPuzzleIds,
-            achievement_ids: updatedUser.achievements,
-            updated_at: new Date().toISOString()
+            achievement_ids: updatedUser.achievements
         })
         .eq('id', updatedUser.id);
 

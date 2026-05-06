@@ -166,22 +166,37 @@ const PuzzleList: React.FC = () => {
                             <p className="text-gray-400 text-sm mb-6 flex-grow">{puzzle.description}</p>
                             
                             <div className="flex items-center justify-between pt-4 border-t border-gray-700/50">
-                                <div className="flex items-center text-yellow-400 font-bold text-sm">
-                                    <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                    </svg>
-                                    {puzzle.points} XP
+                                <div className="flex flex-col">
+                                    <div className="flex items-center text-yellow-400 font-bold text-sm">
+                                        <span className="mr-1 text-yellow-500">◈</span>
+                                        {puzzle.points} Pts
+                                    </div>
+                                    <div className="flex items-center text-blue-400 font-bold text-xs">
+                                        <svg className="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        </svg>
+                                        {puzzle.xp} XP
+                                    </div>
                                 </div>
                                 <button 
                                     onClick={() => handleStartPuzzle(puzzle)}
                                     disabled={puzzle.requiredLevel !== undefined && (user?.level || 1) < puzzle.requiredLevel}
                                     className={`text-sm font-bold py-2 px-4 rounded-lg transition-colors shadow-lg shadow-blue-900/20 ${
-                                        puzzle.requiredLevel !== undefined && (user?.level || 1) < puzzle.requiredLevel
-                                            ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                            : 'bg-blue-600 hover:bg-blue-500 text-white'
+                                        user?.solvedPuzzleIds.includes(puzzle.id)
+                                            ? 'bg-green-600/20 text-green-400 border border-green-500/50 hover:bg-green-600/30'
+                                            : puzzle.requiredLevel !== undefined && (user?.level || 1) < puzzle.requiredLevel
+                                                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                                                : 'bg-blue-600 hover:bg-blue-500 text-white'
                                     }`}
                                 >
-                                    {puzzle.requiredLevel !== undefined && (user?.level || 1) < puzzle.requiredLevel ? (
+                                    {user?.solvedPuzzleIds.includes(puzzle.id) ? (
+                                        <span className="flex items-center gap-1">
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            Solved
+                                        </span>
+                                    ) : puzzle.requiredLevel !== undefined && (user?.level || 1) < puzzle.requiredLevel ? (
                                         <span className="flex items-center gap-1">
                                             <LockIcon className="w-4 h-4" /> Locked (Lvl {puzzle.requiredLevel})
                                         </span>

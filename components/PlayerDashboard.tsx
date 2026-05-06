@@ -60,7 +60,13 @@ const PlayerDashboard: React.FC = () => {
                                                 puzzle.difficulty === 'Medium' ? 'bg-yellow-800 text-yellow-200' : puzzle.difficulty === 'Hard' ? 'bg-red-800 text-red-200' : 'bg-green-800 text-green-200'
                                             }`}>{puzzle.difficulty}</span>
                                         </div>
-                                         <p className="text-sm text-gray-400">{puzzle.category} &middot; {puzzle.points} Points</p>
+                                         <div className="flex flex-col">
+                                            <p className="text-sm text-gray-400">{puzzle.category}</p>
+                                            <div className="flex gap-2">
+                                                <span className="text-xs font-bold text-yellow-500">◈ {puzzle.points} Pts</span>
+                                                <span className="text-xs font-bold text-blue-400">⚡ {puzzle.xp} XP</span>
+                                            </div>
+                                         </div>
                                      </div>
                                      <button onClick={() => startPuzzle(puzzle)} className="bg-primary hover:bg-red-900 text-white font-bold py-2 px-4 rounded-lg transition-colors text-sm whitespace-nowrap">
                                         Start

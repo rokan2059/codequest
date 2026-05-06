@@ -8,7 +8,7 @@ export const getAchievements = async (): Promise<Achievement[]> => {
     
     if (error) {
         console.error('Error fetching achievements:', error);
-        return [];
+        throw error;
     }
 
     return data.map(a => ({

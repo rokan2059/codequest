@@ -15,7 +15,7 @@ const AchievementManagement: React.FC = () => {
         if (!name || !description) return;
         
         const newAchievement: Achievement = {
-            id: 'ach_' + Date.now(),
+            id: 'ach_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
             name,
             description,
             icon,
@@ -32,7 +32,18 @@ const AchievementManagement: React.FC = () => {
 
     return (
         <div className="p-6 bg-slate-800 rounded-xl">
-            <h2 className="text-2xl font-bold text-white mb-6">Achievement Maker</h2>
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-white">Achievement Maker</h2>
+                <button 
+                    onClick={() => dispatch({ type: 'SET_ADMIN_VIEW', payload: 'main' })}
+                    className="flex items-center gap-2 px-3 py-1 bg-slate-700 hover:bg-slate-600 text-white rounded transition-colors text-sm"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+                    </svg>
+                    Back to Dashboard
+                </button>
+            </div>
             <form onSubmit={handleAdd} className="space-y-4 mb-8">
                 <input type="text" placeholder="Name" value={name} onChange={e => setName(e.target.value)} className="w-full p-2 bg-slate-900 border border-slate-700 rounded text-white" />
                 <input type="text" placeholder="Description" value={description} onChange={e => setDescription(e.target.value)} className="w-full p-2 bg-slate-900 border border-slate-700 rounded text-white" />

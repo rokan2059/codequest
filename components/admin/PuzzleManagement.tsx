@@ -10,7 +10,6 @@ const BLANK_FORM_STATE = {
     description: '',
     code: '',
     answer: '',
-    points: '10',
     xp: '0',
     requiredLevel: '1'
 };
@@ -83,7 +82,7 @@ const PuzzleManagement: React.FC = () => {
             addToast('Puzzle updated successfully!', 'success');
             setEditingPuzzle(null);
         } else {
-            addPuzzle({ ...puzzleData, id: `puzzle_${Date.now()}` });
+            addPuzzle({ ...puzzleData, id: `puzzle_${Date.now()}_${Math.floor(Math.random() * 1000)}` });
             addToast('New puzzle added successfully!', 'success');
         }
     };
@@ -121,9 +120,17 @@ const PuzzleManagement: React.FC = () => {
                                 <option>Medium</option>
                                 <option>Hard</option>
                             </select>
-                            <input type="number" name="points" value={formState.points} onChange={handleInputChange} placeholder="Points" className="w-full p-2 bg-gray-900 border border-gray-700 rounded" required/>
-                            <input type="number" name="xp" value={formState.xp} onChange={handleInputChange} placeholder="XP" className="w-full p-2 bg-gray-900 border border-gray-700 rounded" required/>
-                            <input type="number" name="requiredLevel" value={formState.requiredLevel} onChange={handleInputChange} placeholder="Req Level" className="w-full p-2 bg-gray-900 border border-gray-700 rounded" required/>
+                            <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-1">Points (Leaderboard)</label>
+                                <input type="number" name="points" value={formState.points} onChange={handleInputChange} placeholder="10" className="w-full p-2 bg-gray-900 border border-gray-700 rounded focus:border-blue-500 focus:outline-none" required/>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-1">XP (Leveling)</label>
+                                <input type="number" name="xp" value={formState.xp} onChange={handleInputChange} placeholder="150" className="w-full p-2 bg-gray-900 border border-gray-700 rounded focus:border-blue-500 focus:outline-none" required/>
+                            </div>
+                        </div>
+                        <input type="number" name="requiredLevel" value={formState.requiredLevel} onChange={handleInputChange} placeholder="Req Level" className="w-full p-2 bg-gray-900 border border-gray-700 rounded" required/>
                         </div>
                         <div className="flex gap-2">
                              <button type="submit" className="flex-grow bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">

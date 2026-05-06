@@ -9,7 +9,7 @@ export const getPuzzles = async (): Promise<Record<string, Puzzle[]>> => {
     
     if (error) {
         console.error('Error fetching puzzles:', error);
-        return {};
+        throw error;
     }
 
     const puzzlesByCategory: Record<string, Puzzle[]> = {};
