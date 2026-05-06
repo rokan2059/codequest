@@ -105,8 +105,11 @@ const appReducer = (state: AppState, action: Action): AppState => {
                 achievements: action.payload.achievements,
             };
         case 'LOGIN_SUCCESS':
-            // Only change view if current view is login or undefined to prevent redirect from active screens
-            const shouldChangeView = state.view === 'login' || (state.user === null && state.view === 'player_dashboard');
+            // Only change view if current view is login to prevent redirect from active screens
+            // or if we are on the dashboard and don't have a user yet (initial load)
+            const activeViews: View[] = ['puzzles', 'leaderboard', 'profile', 'puzzle_view'];
+            const isOnActiveView = activeViews.includes(state.view);
+            const shouldChangeView = state.view === 'login' || (!isOnActiveView && state.user === null);
             const updatedUser = action.payload;
             
             // Re-sync the player in the players list if it exists
@@ -364,19 +367,22 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
         try {
             await Auth.updateUser(finalUpdatedUser);
-            // Update local state immediately for responsiveness
+            
+            // Update local state ONLY after successful DB update
             dispatch({ type: 'LOGIN_SUCCESS', payload: finalUpdatedUser });
             
-            // Optionally refresh players list for leaderboard
+            // Refresh players list for leaderboard
             const players = await Auth.getPlayers();
             dispatch({ type: 'INITIALIZE_DATA', payload: { puzzles: state.puzzles, players, achievements: state.achievements } });
             
             if (newLevel > state.user.level) {
                 addToast(`Level Up! You are now level ${newLevel}! 🎊`, 'success');
             }
+            
+            addToast(`Puzzle completed! +${points} points, +${xpValue} XP`, 'success');
         } catch (error) {
             console.error('Failed to update user after puzzle completion:', error);
-            addToast('Correct, but failed to save progress. Please try again.', 'error');
+            addToast('Correct, but failed to save progress to the server. Please try again.', 'error');
         }
     };
 

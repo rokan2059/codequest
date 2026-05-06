@@ -30,7 +30,7 @@ export const calculateTotalXp = (level: number, xpInLevel: number) => {
 export const getPlayers = async (): Promise<User[]> => {
     const { data, error } = await supabase
         .from('profiles')
-        .select('*');
+        .select('id, email, role, points, xp, level, solved_puzzle_ids, achievement_ids');
     
     if (error) {
         console.error('Error fetching players:', error);
@@ -126,7 +126,7 @@ export const getLoggedInUser = async (): Promise<User | null> => {
 
     const { data: profile, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, email, role, points, xp, level, solved_puzzle_ids, achievement_ids')
         .eq('id', session.user.id)
         .single();
 
@@ -159,10 +159,12 @@ export const updateUser = async (updatedUser: User) => {
             solved_puzzle_ids: updatedUser.solvedPuzzleIds,
             achievement_ids: updatedUser.achievements
         })
-        .eq('id', updatedUser.id);
+        .eq('id', updatedUser.id)
+        .select('id');
 
     if (error) {
         console.error('Error updating profile:', error);
+        throw error;
     }
 };
 
