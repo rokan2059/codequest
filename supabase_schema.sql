@@ -75,12 +75,30 @@ BEGIN
     
     DROP POLICY IF EXISTS "Puzzles are viewable by everyone" ON public.puzzles;
     CREATE POLICY "Puzzles are viewable by everyone" ON puzzles FOR SELECT USING (true);
+
+    DROP POLICY IF EXISTS "Admins can manage puzzles" ON public.puzzles;
+    CREATE POLICY "Admins can manage puzzles" ON puzzles 
+        FOR ALL USING (
+            EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
+        );
     
     DROP POLICY IF EXISTS "Achievements are viewable by everyone" ON public.achievements;
     CREATE POLICY "Achievements are viewable by everyone" ON achievements FOR SELECT USING (true);
 
+    DROP POLICY IF EXISTS "Admins can manage achievements" ON public.achievements;
+    CREATE POLICY "Admins can manage achievements" ON achievements 
+        FOR ALL USING (
+            EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
+        );
+
     DROP POLICY IF EXISTS "Categories are viewable by everyone" ON public.categories;
     CREATE POLICY "Categories are viewable by everyone" ON public.categories FOR SELECT USING (true);
+
+    DROP POLICY IF EXISTS "Admins can manage categories" ON public.categories;
+    CREATE POLICY "Admins can manage categories" ON public.categories 
+        FOR ALL USING (
+            EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
+        );
 END $$;
 
 -- 7. AUTH TRIGGER

@@ -253,7 +253,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         try {
             await PuzzleService.addPuzzle(puzzle);
             const puzzles = await PuzzleService.getPuzzles();
-            dispatch({ type: 'INITIALIZE_DATA', payload: { ...state, puzzles, players: state.players, achievements: state.achievements } });
+            dispatch({ type: 'INITIALIZE_DATA', payload: { puzzles, players: state.players, achievements: state.achievements } });
             addToast('Puzzle added successfully');
         } catch (error: any) {
             addToast(error.message || 'Error adding puzzle', 'error');
@@ -264,7 +264,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         try {
             await PuzzleService.editPuzzle(puzzle);
             const puzzles = await PuzzleService.getPuzzles();
-            dispatch({ type: 'INITIALIZE_DATA', payload: { ...state, puzzles, players: state.players, achievements: state.achievements } });
+            dispatch({ type: 'INITIALIZE_DATA', payload: { puzzles, players: state.players, achievements: state.achievements } });
             addToast('Puzzle updated successfully');
         } catch (error: any) {
             addToast(error.message || 'Error updating puzzle', 'error');
@@ -275,7 +275,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         try {
             await PuzzleService.deletePuzzle(puzzleId);
             const puzzles = await PuzzleService.getPuzzles();
-            dispatch({ type: 'INITIALIZE_DATA', payload: { ...state, puzzles, players: state.players, achievements: state.achievements } });
+            dispatch({ type: 'INITIALIZE_DATA', payload: { puzzles, players: state.players, achievements: state.achievements } });
             addToast('Puzzle deleted successfully');
         } catch (error: any) {
             addToast(error.message || 'Error deleting puzzle', 'error');
@@ -283,18 +283,24 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     };
 
     const addCategory = async (name: string) => {
-        await PuzzleService.addCategory(name);
-        const puzzles = await PuzzleService.getPuzzles();
-        dispatch({ type: 'INITIALIZE_DATA', payload: { ...state, puzzles, players: state.players, achievements: state.achievements } });
+        try {
+            await PuzzleService.addCategory(name);
+            const puzzles = await PuzzleService.getPuzzles();
+            dispatch({ type: 'INITIALIZE_DATA', payload: { puzzles, players: state.players, achievements: state.achievements } });
+        } catch (error: any) {
+            console.error('Failed to add category:', error);
+            throw error;
+        }
     };
 
     const editCategory = async (oldName: string, newName: string) => {
         try {
-            await PuzzleService.editCategory(oldName, newName);
+            await PuzzleService.editCategory(oldName, newName.trim());
             const puzzles = await PuzzleService.getPuzzles();
-            dispatch({ type: 'INITIALIZE_DATA', payload: { ...state, puzzles, players: state.players, achievements: state.achievements } });
-            addToast('Category updated successfully');
+            dispatch({ type: 'INITIALIZE_DATA', payload: { puzzles, players: state.players, achievements: state.achievements } });
+            addToast(`Category renamed to "${newName.trim()}"`, 'success');
         } catch (error: any) {
+            console.error('Failed to update category:', error);
             addToast(error.message || 'Error updating category', 'error');
         }
     };
@@ -303,9 +309,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         try {
             await PuzzleService.deleteCategory(name);
             const puzzles = await PuzzleService.getPuzzles();
-            dispatch({ type: 'INITIALIZE_DATA', payload: { ...state, puzzles, players: state.players, achievements: state.achievements } });
-            addToast('Category deleted successfully');
+            dispatch({ type: 'INITIALIZE_DATA', payload: { puzzles, players: state.players, achievements: state.achievements } });
+            addToast(`Category "${name}" deleted successfully`, 'success');
         } catch (error: any) {
+            console.error('Failed to delete category:', error);
             addToast(error.message || 'Error deleting category', 'error');
         }
     };
@@ -313,7 +320,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const deletePlayer = async (id: string) => {
         await Auth.deleteUser(id);
         const players = await Auth.getPlayers();
-        dispatch({ type: 'INITIALIZE_DATA', payload: { ...state, players, puzzles: state.puzzles, achievements: state.achievements } });
+        dispatch({ type: 'INITIALIZE_DATA', payload: { players, puzzles: state.puzzles, achievements: state.achievements } });
         addToast('Player deleted successfully');
     };
 
@@ -321,7 +328,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         await Auth.resetUserProgress(id);
         const players = await Auth.getPlayers();
         const loggedInUser = await Auth.getLoggedInUser();
-        dispatch({ type: 'INITIALIZE_DATA', payload: { ...state, players, puzzles: state.puzzles, achievements: state.achievements } });
+        dispatch({ type: 'INITIALIZE_DATA', payload: { players, puzzles: state.puzzles, achievements: state.achievements } });
         if (loggedInUser && loggedInUser.id === id) {
             dispatch({ type: 'LOGIN_SUCCESS', payload: loggedInUser });
         }

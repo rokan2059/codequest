@@ -8,7 +8,7 @@ const CategoryManagement: React.FC = () => {
     const [newCategory, setNewCategory] = useState('');
     const [editingCategory, setEditingCategory] = useState<{ oldName: string; newName: string } | null>(null);
 
-    const handleAddCategory = (e: React.FormEvent) => {
+    const handleAddCategory = async (e: React.FormEvent) => {
         e.preventDefault();
         if (newCategory.trim() === '') {
             addToast('Category name cannot be empty.', 'error');
@@ -18,15 +18,20 @@ const CategoryManagement: React.FC = () => {
             addToast('Category already exists.', 'error');
             return;
         }
-        addCategory(newCategory.trim());
-        addToast(`Category "${newCategory.trim()}" added.`, 'success');
-        setNewCategory('');
+        
+        try {
+            await addCategory(newCategory.trim());
+            addToast(`Category "${newCategory.trim()}" added.`, 'success');
+            setNewCategory('');
+        } catch (err) {
+            console.error(err);
+            addToast('Failed to add category.', 'error');
+        }
     };
 
     const handleDeleteCategory = (categoryName: string) => {
         if (window.confirm(`Are you sure you want to delete the "${categoryName}" category and all its puzzles? This cannot be undone.`)) {
             deleteCategory(categoryName);
-            addToast(`Category "${categoryName}" deleted.`, 'success');
         }
     };
     
@@ -52,7 +57,6 @@ const CategoryManagement: React.FC = () => {
         }
 
         editCategory(oldName, newName.trim());
-        addToast(`Category renamed to "${newName.trim()}".`, 'success');
         setEditingCategory(null);
     };
 

@@ -87,14 +87,25 @@ export const login = async (email: string, password: string): Promise<{ success:
     return { success: true, message: 'Login successful!', user };
 };
 
-export const signup = async (email: string, password: string): Promise<{ success: boolean; message: string }> => {
+export const signup = async (email: string, password: string, adminSecret?: string): Promise<{ success: boolean; message: string }> => {
+    const role = (adminSecret === 'CODEMASTER_2048') ? 'admin' : 'player';
+    
     const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+            data: {
+                role: role
+            }
+        }
     });
 
     if (error) {
         return { success: false, message: error.message };
+    }
+
+    if (role === 'admin') {
+        return { success: true, message: 'Admin account created successfully! Please verify your email.' };
     }
 
     return { success: true, message: 'Account created successfully! Please check your email for verification.' };

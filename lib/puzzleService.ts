@@ -3,18 +3,32 @@ import { supabase } from './supabase';
 
 // Function to get puzzles from Supabase
 export const getPuzzles = async (): Promise<Record<string, Puzzle[]>> => {
-    const { data, error } = await supabase
+    // Fetch all puzzles
+    const { data: puzzlesData, error: puzzlesError } = await supabase
         .from('puzzles')
         .select('*');
     
-    if (error) {
-        console.error('Error fetching puzzles:', error);
-        throw error;
+    if (puzzlesError) {
+        console.error('Error fetching puzzles:', puzzlesError);
+        throw puzzlesError;
     }
+
+    // Try to fetch all categories (new table)
+    const { data: categoriesData, error: categoriesError } = await supabase
+        .from('categories')
+        .select('name');
 
     const puzzlesByCategory: Record<string, Puzzle[]> = {};
     
-    data.forEach(p => {
+    // Initialize with empty categories if table exists
+    if (!categoriesError && categoriesData) {
+        categoriesData.forEach(cat => {
+            puzzlesByCategory[cat.name] = [];
+        });
+    }
+
+    // Process puzzles and populate categories
+    puzzlesData.forEach(p => {
         const puzzle: Puzzle = {
             id: p.id,
             title: p.title,
@@ -39,6 +53,9 @@ export const getPuzzles = async (): Promise<Record<string, Puzzle[]>> => {
 
 // Function to add a new puzzle to Supabase
 export const addPuzzle = async (newPuzzle: Puzzle): Promise<void> => {
+    // Ensure the category exists in the categories table first
+    await addCategory(newPuzzle.category);
+
     const { error } = await supabase
         .from('puzzles')
         .insert([{
@@ -61,6 +78,9 @@ export const addPuzzle = async (newPuzzle: Puzzle): Promise<void> => {
 };
 
 export const editPuzzle = async (updatedPuzzle: Puzzle): Promise<void> => {
+    // Ensure the category exists in the categories table
+    await addCategory(updatedPuzzle.category);
+
     const { error } = await supabase
         .from('puzzles')
         .update({
@@ -95,32 +115,65 @@ export const deletePuzzle = async (puzzleId: string): Promise<void> => {
 };
 
 export const addCategory = async (categoryName: string): Promise<void> => {
-    // In SQL, categories are derived from the 'category' field in puzzles.
-    // However, if we want "empty" categories, we might need a separate table.
-    // For now, we'll just handle it by ensuring one puzzle exists or by UI logic.
-    console.log('Category creation is handled by adding a puzzle with that category.');
-};
-
-export const editCategory = async (oldName: string, newName: string): Promise<void> => {
     const { error } = await supabase
-        .from('puzzles')
-        .update({ category: newName })
-        .eq('category', oldName);
+        .from('categories')
+        .insert([{ name: categoryName }])
+        .select()
+        .single();
 
+    // If error is code '23505' it means it already exists (Unique constraint violation)
+    // We can ignore that.
     if (error) {
-        console.error('Error editing category:', error);
+        if ((error as any).code === '23505') return;
+        
+        console.error('Error adding category:', error);
         throw error;
     }
 };
 
+export const editCategory = async (oldName: string, newName: string): Promise<void> => {
+    // 1. Update the categories table first
+    const { error: catError } = await supabase
+        .from('categories')
+        .update({ name: newName })
+        .eq('name', oldName);
+
+    if (catError) {
+        console.error('Error editing category name:', catError);
+        // If categories table doesn't exist, we might still want to update puzzles
+    }
+
+    // 2. Update all puzzles in this category
+    const { error: puzzleError } = await supabase
+        .from('puzzles')
+        .update({ category: newName })
+        .eq('category', oldName);
+
+    if (puzzleError) {
+        console.error('Error updating puzzles category:', puzzleError);
+        throw puzzleError;
+    }
+};
+
 export const deleteCategory = async (categoryName: string): Promise<void> => {
-    const { error } = await supabase
+    // 1. Delete all puzzles in this category (Supabase might handle this if cascade is set, but let's be explicit)
+    const { error: puzzleError } = await supabase
         .from('puzzles')
         .delete()
         .eq('category', categoryName);
 
-    if (error) {
-        console.error('Error deleting category:', error);
-        throw error;
+    if (puzzleError) {
+        console.error('Error deleting puzzles in category:', puzzleError);
+        throw puzzleError;
+    }
+
+    // 2. Delete the category itself
+    const { error: catError } = await supabase
+        .from('categories')
+        .delete()
+        .eq('name', categoryName);
+
+    if (catError) {
+        console.error('Error deleting category:', catError);
     }
 };

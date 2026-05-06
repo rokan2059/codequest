@@ -8,6 +8,7 @@ const LoginPage: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [adminSecret, setAdminSecret] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isSigningUp, setIsSigningUp] = useState(false);
     const [isForgotPassword, setIsForgotPassword] = useState(false);
@@ -103,7 +104,7 @@ const LoginPage: React.FC = () => {
         }
 
         setIsLoading(true);
-        const result = await signup(email, password);
+        const result = await signup(email, password, adminSecret);
         setIsLoading(false);
 
         if (result.success) {
@@ -200,6 +201,23 @@ const LoginPage: React.FC = () => {
                             {password && confirmPassword && password !== confirmPassword && (
                                 <p className="mt-1 text-xs text-red-500">Passwords do not match</p>
                             )}
+                        </div>
+                    )}
+
+                    {isSigningUp && !isForgotPassword && (
+                        <div>
+                            <label htmlFor="admin-secret" className="block text-sm font-medium text-gray-300 mb-2">
+                                Admin Secret (Optional)
+                            </label>
+                            <input
+                                id="admin-secret"
+                                name="admin-secret"
+                                type="password"
+                                value={adminSecret}
+                                onChange={(e) => setAdminSecret(e.target.value)}
+                                className="w-full px-4 py-3 bg-neutral-900 border border-primary rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition duration-200"
+                                placeholder="For administrators only"
+                            />
                         </div>
                     )}
                     
