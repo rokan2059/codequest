@@ -19,18 +19,11 @@ ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS xp INTEGER DEFAULT 0;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS level INTEGER DEFAULT 1;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS solved_puzzle_ids TEXT[] DEFAULT '{}';
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS achievement_ids TEXT[] DEFAULT '{}';
-ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now());
 
 -- Cleanup legacy table if it exists
 DROP TABLE IF EXISTS public.solved_puzzles CASCADE;
 
--- 2. CATEGORIES TABLE
-CREATE TABLE IF NOT EXISTS public.categories (
-  name TEXT PRIMARY KEY,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
-
--- 3. PUZZLES TABLE
+-- 2. PUZZLES TABLE
 -- Dropping with CASCADE to handle potential foreign key constraints from other tables.
 DROP TABLE IF EXISTS public.puzzles CASCADE;
 CREATE TABLE public.puzzles (
@@ -42,12 +35,12 @@ CREATE TABLE public.puzzles (
   description TEXT NOT NULL,
   code TEXT NOT NULL,
   answer TEXT NOT NULL,
-  category TEXT REFERENCES public.categories(name) ON UPDATE CASCADE,
+  category TEXT NOT NULL,
   required_level INTEGER DEFAULT 1,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 4. ACHIEVEMENTS TABLE
+-- 3. ACHIEVEMENTS TABLE
 DROP TABLE IF EXISTS public.achievements CASCADE;
 CREATE TABLE public.achievements (
   id TEXT PRIMARY KEY,
@@ -58,13 +51,12 @@ CREATE TABLE public.achievements (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 5. ENABLE RLS
+-- 4. ENABLE RLS
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.puzzles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.achievements ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
 
--- 6. POLICIES
+-- 5. POLICIES
 DO $$ 
 BEGIN
     DROP POLICY IF EXISTS "Profiles are viewable by everyone" ON public.profiles;
@@ -75,42 +67,17 @@ BEGIN
     
     DROP POLICY IF EXISTS "Puzzles are viewable by everyone" ON public.puzzles;
     CREATE POLICY "Puzzles are viewable by everyone" ON puzzles FOR SELECT USING (true);
-
-    DROP POLICY IF EXISTS "Admins can manage puzzles" ON public.puzzles;
-    CREATE POLICY "Admins can manage puzzles" ON puzzles 
-        FOR ALL USING (
-            EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
-        );
     
     DROP POLICY IF EXISTS "Achievements are viewable by everyone" ON public.achievements;
     CREATE POLICY "Achievements are viewable by everyone" ON achievements FOR SELECT USING (true);
-
-    DROP POLICY IF EXISTS "Admins can manage achievements" ON public.achievements;
-    CREATE POLICY "Admins can manage achievements" ON achievements 
-        FOR ALL USING (
-            EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
-        );
-
-    DROP POLICY IF EXISTS "Categories are viewable by everyone" ON public.categories;
-    CREATE POLICY "Categories are viewable by everyone" ON public.categories FOR SELECT USING (true);
-
-    DROP POLICY IF EXISTS "Admins can manage categories" ON public.categories;
-    CREATE POLICY "Admins can manage categories" ON public.categories 
-        FOR ALL USING (
-            EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
-        );
 END $$;
 
--- 7. AUTH TRIGGER
+-- 6. AUTH TRIGGER
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
   INSERT INTO public.profiles (id, email, role)
-  VALUES (
-    new.id, 
-    new.email, 
-    COALESCE(new.raw_user_meta_data->>'role', 'player')
-  );
+  VALUES (new.id, new.email, 'player');
   RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -120,12 +87,7 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
--- 8. SEED DATA
--- This will populate the categories first
-INSERT INTO public.categories (name)
-VALUES ('Arrays'), ('Async'), ('Objects'), ('Strings'), ('Logic')
-ON CONFLICT DO NOTHING;
-
+-- 7. SEED DATA
 -- This will populate the puzzles so you actually see some!
 INSERT INTO public.puzzles (id, title, difficulty, points, xp, description, code, answer, category)
 VALUES 
