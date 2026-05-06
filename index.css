@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+body {
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #0f0505; /* dark background */
+    color: #f8fafc; /* light text */
+}
+
+/* Custom Scrollbar for a more polished look */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #1f0a0a; /* Darker red-brown */
+}
+::-webkit-scrollbar-thumb {
+    background: #7f1d1d; /* Dark Red */
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #991b1b; /* Lighter dark red */
+}
+
+
+@keyframes slideUpAndFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-up-fade-in {
+    animation: slideUpAndFadeIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
