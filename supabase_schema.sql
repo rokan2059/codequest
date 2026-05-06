@@ -24,7 +24,13 @@ ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH T
 -- Cleanup legacy table if it exists
 DROP TABLE IF EXISTS public.solved_puzzles CASCADE;
 
--- 2. PUZZLES TABLE
+-- 2. CATEGORIES TABLE
+CREATE TABLE IF NOT EXISTS public.categories (
+  name TEXT PRIMARY KEY,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 3. PUZZLES TABLE
 -- Dropping with CASCADE to handle potential foreign key constraints from other tables.
 DROP TABLE IF EXISTS public.puzzles CASCADE;
 CREATE TABLE public.puzzles (
@@ -36,12 +42,12 @@ CREATE TABLE public.puzzles (
   description TEXT NOT NULL,
   code TEXT NOT NULL,
   answer TEXT NOT NULL,
-  category TEXT NOT NULL,
+  category TEXT REFERENCES public.categories(name) ON UPDATE CASCADE,
   required_level INTEGER DEFAULT 1,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 3. ACHIEVEMENTS TABLE
+-- 4. ACHIEVEMENTS TABLE
 DROP TABLE IF EXISTS public.achievements CASCADE;
 CREATE TABLE public.achievements (
   id TEXT PRIMARY KEY,
@@ -52,12 +58,13 @@ CREATE TABLE public.achievements (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 4. ENABLE RLS
+-- 5. ENABLE RLS
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.puzzles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.achievements ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
 
--- 5. POLICIES
+-- 6. POLICIES
 DO $$ 
 BEGIN
     DROP POLICY IF EXISTS "Profiles are viewable by everyone" ON public.profiles;
@@ -71,14 +78,21 @@ BEGIN
     
     DROP POLICY IF EXISTS "Achievements are viewable by everyone" ON public.achievements;
     CREATE POLICY "Achievements are viewable by everyone" ON achievements FOR SELECT USING (true);
+
+    DROP POLICY IF EXISTS "Categories are viewable by everyone" ON public.categories;
+    CREATE POLICY "Categories are viewable by everyone" ON public.categories FOR SELECT USING (true);
 END $$;
 
--- 6. AUTH TRIGGER
+-- 7. AUTH TRIGGER
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
   INSERT INTO public.profiles (id, email, role)
-  VALUES (new.id, new.email, 'player');
+  VALUES (
+    new.id, 
+    new.email, 
+    COALESCE(new.raw_user_meta_data->>'role', 'player')
+  );
   RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -88,7 +102,12 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
--- 7. SEED DATA
+-- 8. SEED DATA
+-- This will populate the categories first
+INSERT INTO public.categories (name)
+VALUES ('Arrays'), ('Async'), ('Objects'), ('Strings'), ('Logic')
+ON CONFLICT DO NOTHING;
+
 -- This will populate the puzzles so you actually see some!
 INSERT INTO public.puzzles (id, title, difficulty, points, xp, description, code, answer, category)
 VALUES 
