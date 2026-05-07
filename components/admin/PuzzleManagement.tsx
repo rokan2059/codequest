@@ -52,17 +52,20 @@ const PuzzleManagement: React.FC = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    const handleDeleteClick = (puzzle: Puzzle) => {
+    const handleDeleteClick = async (puzzle: Puzzle) => {
         if (window.confirm(`Are you sure you want to delete the puzzle "${puzzle.title}"? This cannot be undone.`)) {
-            deletePuzzle(puzzle.id);
-            addToast(`Puzzle "${puzzle.title}" deleted.`, 'success');
-            if(editingPuzzle?.id === puzzle.id) {
-                handleCancelEdit();
+            try {
+                await deletePuzzle(puzzle.id);
+                if(editingPuzzle?.id === puzzle.id) {
+                    handleCancelEdit();
+                }
+            } catch (e) {
+                // error is already handled by context
             }
         }
     }
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
         const puzzleData = {
@@ -77,14 +80,18 @@ const PuzzleManagement: React.FC = () => {
             return;
         }
 
-        if (editingPuzzle) {
-            editPuzzle({ ...puzzleData, id: editingPuzzle.id });
-            addToast('Puzzle updated successfully!', 'success');
-            setEditingPuzzle(null);
-        } else {
-            addPuzzle({ ...puzzleData, id: `puzzle_${Date.now()}_${Math.floor(Math.random() * 1000)}` });
-            addToast('New puzzle added successfully!', 'success');
-        }
+        try {
+            if (editingPuzzle) {
+                await editPuzzle({ ...puzzleData, id: editingPuzzle.id });
+                setEditingPuzzle(null);
+            } else {
+                await addPuzzle({ ...puzzleData, id: `puzzle_${Date.now()}_${Math.floor(Math.random() * 1000)}` });
+                setFormState({
+                    ...BLANK_FORM_STATE,
+                    category: puzzleCategories.includes(puzzleData.category) ? puzzleData.category : (puzzleCategories[0] || '')
+                });
+            }
+        } catch(e) {}
     };
 
     return (

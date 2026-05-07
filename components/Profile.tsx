@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import TrophyIcon from './icons/TrophyIcon';
 import PuzzleIcon from './icons/PuzzleIcon';
 import ChartBarIcon from './icons/ChartBarIcon';
 import { useAppContext } from '../context/AppContext';
+import { makeUserAdmin } from '../lib/auth';
 
 const Profile: React.FC = () => {
-    const { state } = useAppContext();
+    const { state, dispatch, addToast } = useAppContext();
     const { user, players, achievements } = state;
+    const [isUpgrading, setIsUpgrading] = useState(false);
 
     if (!user) return null;
 
@@ -17,6 +19,20 @@ const Profile: React.FC = () => {
     const userAchievements = achievements.filter(ach => user.achievements.includes(ach.id));
     const xpProgress = user.xpToNextLevel > 0 ? (user.xp / user.xpToNextLevel) * 100 : 0;
 
+    const handleMakeAdmin = async () => {
+        setIsUpgrading(true);
+        try {
+            await makeUserAdmin(user.id);
+            addToast('Upgraded profile to Admin! Logging you back in automatically...', 'success');
+            // Optimistically update context to see the admin view instantly
+            dispatch({ type: 'LOGIN_SUCCESS', payload: { ...user, role: 'admin' } });
+        } catch (error: any) {
+            addToast('Failed to make you an admin.', 'error');
+        } finally {
+            setIsUpgrading(false);
+        }
+    };
+
     return (
         <div className="container mx-auto max-w-4xl">
             <div className="text-center mb-10">
@@ -24,7 +40,16 @@ const Profile: React.FC = () => {
                      <span className="text-4xl font-bold text-slate-100">{user.email.charAt(0).toUpperCase()}</span>
                 </div>
                 <h1 className="text-4xl font-bold text-slate-100">{user.email}</h1>
-                <p className="text-lg text-slate-400">Level {user.level}</p>
+                <p className="text-lg text-slate-400">Level {user.level} {user.role === 'admin' ? '(Admin)' : ''}</p>
+                {user.role !== 'admin' && (
+                    <button 
+                        onClick={handleMakeAdmin}
+                        disabled={isUpgrading}
+                        className="mt-4 text-xs bg-red-900/40 hover:bg-red-800 text-red-200 py-1 px-3 rounded border border-red-800/50 transition-colors"
+                    >
+                        {isUpgrading ? 'Upgrading...' : 'Make Me Admin (Dev Only)'}
+                    </button>
+                )}
             </div>
 
             {/* XP Bar */}

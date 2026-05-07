@@ -64,11 +64,11 @@ const AppContext = createContext<{
     selectCategory: (category: string | null) => void;
     addToast: (message: string, type?: 'success' | 'error') => void;
     addPuzzle: (puzzle: Puzzle) => void;
-    editPuzzle: (puzzle: Puzzle) => void;
-    deletePuzzle: (puzzleId: string) => void;
-    addCategory: (name: string) => void;
-    editCategory: (oldName: string, newName: string) => void;
-    deleteCategory: (name: string) => void;
+    editPuzzle: (puzzle: Puzzle) => Promise<void>;
+    deletePuzzle: (puzzleId: string) => Promise<void>;
+    addCategory: (name: string) => Promise<void>;
+    editCategory: (oldName: string, newName: string) => Promise<void>;
+    deleteCategory: (name: string) => Promise<void>;
     deletePlayer: (id: string) => void;
     resetPlayerProgress: (id: string) => void;
     completePuzzle: (puzzleId: string, points: number, xpValue: number) => void;
@@ -83,11 +83,11 @@ const AppContext = createContext<{
     selectCategory: () => {},
     addToast: () => {},
     addPuzzle: () => {},
-    editPuzzle: () => {},
-    deletePuzzle: () => {},
-    addCategory: () => {},
-    editCategory: () => {},
-    deleteCategory: () => {},
+    editPuzzle: async () => {},
+    deletePuzzle: async () => {},
+    addCategory: async () => {},
+    editCategory: async () => {},
+    deleteCategory: async () => {},
     deletePlayer: () => {},
     resetPlayerProgress: () => {},
     completePuzzle: () => {},
@@ -105,11 +105,8 @@ const appReducer = (state: AppState, action: Action): AppState => {
                 achievements: action.payload.achievements,
             };
         case 'LOGIN_SUCCESS':
-            // Only change view if current view is login to prevent redirect from active screens
-            // or if we are on the dashboard and don't have a user yet (initial load)
-            const activeViews: View[] = ['puzzles', 'leaderboard', 'profile', 'puzzle_view'];
-            const isOnActiveView = activeViews.includes(state.view);
-            const shouldChangeView = state.view === 'login' || (!isOnActiveView && state.user === null);
+            // Only change view if current view is login or undefined to prevent redirect from active screens
+            const shouldChangeView = state.view === 'login' || (state.user === null && state.view === 'player_dashboard');
             const updatedUser = action.payload;
             
             // Re-sync the player in the players list if it exists
@@ -253,7 +250,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         try {
             await PuzzleService.addPuzzle(puzzle);
             const puzzles = await PuzzleService.getPuzzles();
-            dispatch({ type: 'INITIALIZE_DATA', payload: { puzzles, players: state.players, achievements: state.achievements } });
+            dispatch({ type: 'INITIALIZE_DATA', payload: { ...state, puzzles, players: state.players, achievements: state.achievements } });
             addToast('Puzzle added successfully');
         } catch (error: any) {
             addToast(error.message || 'Error adding puzzle', 'error');
@@ -264,7 +261,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         try {
             await PuzzleService.editPuzzle(puzzle);
             const puzzles = await PuzzleService.getPuzzles();
-            dispatch({ type: 'INITIALIZE_DATA', payload: { puzzles, players: state.players, achievements: state.achievements } });
+            dispatch({ type: 'INITIALIZE_DATA', payload: { ...state, puzzles, players: state.players, achievements: state.achievements } });
             addToast('Puzzle updated successfully');
         } catch (error: any) {
             addToast(error.message || 'Error updating puzzle', 'error');
@@ -275,7 +272,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         try {
             await PuzzleService.deletePuzzle(puzzleId);
             const puzzles = await PuzzleService.getPuzzles();
-            dispatch({ type: 'INITIALIZE_DATA', payload: { puzzles, players: state.players, achievements: state.achievements } });
+            dispatch({ type: 'INITIALIZE_DATA', payload: { ...state, puzzles, players: state.players, achievements: state.achievements } });
             addToast('Puzzle deleted successfully');
         } catch (error: any) {
             addToast(error.message || 'Error deleting puzzle', 'error');
@@ -286,21 +283,20 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         try {
             await PuzzleService.addCategory(name);
             const puzzles = await PuzzleService.getPuzzles();
-            dispatch({ type: 'INITIALIZE_DATA', payload: { puzzles, players: state.players, achievements: state.achievements } });
+            dispatch({ type: 'INITIALIZE_DATA', payload: { ...state, puzzles, players: state.players, achievements: state.achievements } });
+            addToast('Category added successfully');
         } catch (error: any) {
-            console.error('Failed to add category:', error);
-            throw error;
+            addToast(error.message || 'Error adding category', 'error');
         }
     };
 
     const editCategory = async (oldName: string, newName: string) => {
         try {
-            await PuzzleService.editCategory(oldName, newName.trim());
+            await PuzzleService.editCategory(oldName, newName);
             const puzzles = await PuzzleService.getPuzzles();
-            dispatch({ type: 'INITIALIZE_DATA', payload: { puzzles, players: state.players, achievements: state.achievements } });
-            addToast(`Category renamed to "${newName.trim()}"`, 'success');
+            dispatch({ type: 'INITIALIZE_DATA', payload: { ...state, puzzles, players: state.players, achievements: state.achievements } });
+            addToast('Category updated successfully');
         } catch (error: any) {
-            console.error('Failed to update category:', error);
             addToast(error.message || 'Error updating category', 'error');
         }
     };
@@ -309,10 +305,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         try {
             await PuzzleService.deleteCategory(name);
             const puzzles = await PuzzleService.getPuzzles();
-            dispatch({ type: 'INITIALIZE_DATA', payload: { puzzles, players: state.players, achievements: state.achievements } });
-            addToast(`Category "${name}" deleted successfully`, 'success');
+            dispatch({ type: 'INITIALIZE_DATA', payload: { ...state, puzzles, players: state.players, achievements: state.achievements } });
+            addToast('Category deleted successfully');
         } catch (error: any) {
-            console.error('Failed to delete category:', error);
             addToast(error.message || 'Error deleting category', 'error');
         }
     };
@@ -320,7 +315,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const deletePlayer = async (id: string) => {
         await Auth.deleteUser(id);
         const players = await Auth.getPlayers();
-        dispatch({ type: 'INITIALIZE_DATA', payload: { players, puzzles: state.puzzles, achievements: state.achievements } });
+        dispatch({ type: 'INITIALIZE_DATA', payload: { ...state, players, puzzles: state.puzzles, achievements: state.achievements } });
         addToast('Player deleted successfully');
     };
 
@@ -328,7 +323,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         await Auth.resetUserProgress(id);
         const players = await Auth.getPlayers();
         const loggedInUser = await Auth.getLoggedInUser();
-        dispatch({ type: 'INITIALIZE_DATA', payload: { players, puzzles: state.puzzles, achievements: state.achievements } });
+        dispatch({ type: 'INITIALIZE_DATA', payload: { ...state, players, puzzles: state.puzzles, achievements: state.achievements } });
         if (loggedInUser && loggedInUser.id === id) {
             dispatch({ type: 'LOGIN_SUCCESS', payload: loggedInUser });
         }
@@ -374,22 +369,19 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
         try {
             await Auth.updateUser(finalUpdatedUser);
-            
-            // Update local state ONLY after successful DB update
+            // Update local state immediately for responsiveness
             dispatch({ type: 'LOGIN_SUCCESS', payload: finalUpdatedUser });
             
-            // Refresh players list for leaderboard
+            // Optionally refresh players list for leaderboard
             const players = await Auth.getPlayers();
             dispatch({ type: 'INITIALIZE_DATA', payload: { puzzles: state.puzzles, players, achievements: state.achievements } });
             
             if (newLevel > state.user.level) {
                 addToast(`Level Up! You are now level ${newLevel}! 🎊`, 'success');
             }
-            
-            addToast(`Puzzle completed! +${points} points, +${xpValue} XP`, 'success');
         } catch (error) {
             console.error('Failed to update user after puzzle completion:', error);
-            addToast('Correct, but failed to save progress to the server. Please try again.', 'error');
+            addToast('Correct, but failed to save progress. Please try again.', 'error');
         }
     };
 

@@ -30,7 +30,7 @@ export const calculateTotalXp = (level: number, xpInLevel: number) => {
 export const getPlayers = async (): Promise<User[]> => {
     const { data, error } = await supabase
         .from('profiles')
-        .select('id, email, role, points, xp, level, solved_puzzle_ids, achievement_ids');
+        .select('*');
     
     if (error) {
         console.error('Error fetching players:', error);
@@ -87,25 +87,14 @@ export const login = async (email: string, password: string): Promise<{ success:
     return { success: true, message: 'Login successful!', user };
 };
 
-export const signup = async (email: string, password: string, adminSecret?: string): Promise<{ success: boolean; message: string }> => {
-    const role = (adminSecret === 'CODEMASTER_2048') ? 'admin' : 'player';
-    
+export const signup = async (email: string, password: string): Promise<{ success: boolean; message: string }> => {
     const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-            data: {
-                role: role
-            }
-        }
     });
 
     if (error) {
         return { success: false, message: error.message };
-    }
-
-    if (role === 'admin') {
-        return { success: true, message: 'Admin account created successfully! Please verify your email.' };
     }
 
     return { success: true, message: 'Account created successfully! Please check your email for verification.' };
@@ -137,7 +126,7 @@ export const getLoggedInUser = async (): Promise<User | null> => {
 
     const { data: profile, error } = await supabase
         .from('profiles')
-        .select('id, email, role, points, xp, level, solved_puzzle_ids, achievement_ids')
+        .select('*')
         .eq('id', session.user.id)
         .single();
 
@@ -168,13 +157,24 @@ export const updateUser = async (updatedUser: User) => {
             xp: updatedUser.xp,
             level: levelInfo.level,
             solved_puzzle_ids: updatedUser.solvedPuzzleIds,
-            achievement_ids: updatedUser.achievements
+            achievement_ids: updatedUser.achievements,
+            updated_at: new Date().toISOString()
         })
-        .eq('id', updatedUser.id)
-        .select('id');
+        .eq('id', updatedUser.id);
 
     if (error) {
         console.error('Error updating profile:', error);
+    }
+};
+
+export const makeUserAdmin = async (userId: string) => {
+    const { error } = await supabase
+        .from('profiles')
+        .update({ role: 'admin' })
+        .eq('id', userId);
+    
+    if (error) {
+        console.error('Error making user admin:', error);
         throw error;
     }
 };

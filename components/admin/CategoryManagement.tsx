@@ -18,20 +18,19 @@ const CategoryManagement: React.FC = () => {
             addToast('Category already exists.', 'error');
             return;
         }
-        
         try {
             await addCategory(newCategory.trim());
-            addToast(`Category "${newCategory.trim()}" added.`, 'success');
             setNewCategory('');
-        } catch (err) {
-            console.error(err);
-            addToast('Failed to add category.', 'error');
-        }
+        } catch(e) {}
     };
 
-    const handleDeleteCategory = (categoryName: string) => {
+    const handleDeleteCategory = async (categoryName: string) => {
         if (window.confirm(`Are you sure you want to delete the "${categoryName}" category and all its puzzles? This cannot be undone.`)) {
-            deleteCategory(categoryName);
+            try {
+                await deleteCategory(categoryName);
+            } catch (e) {
+                // error handled by context
+            }
         }
     };
     
@@ -43,7 +42,7 @@ const CategoryManagement: React.FC = () => {
         setEditingCategory(null);
     };
 
-    const handleSaveEdit = () => {
+    const handleSaveEdit = async () => {
         if (!editingCategory) return;
         
         const { oldName, newName } = editingCategory;
@@ -56,8 +55,10 @@ const CategoryManagement: React.FC = () => {
             return;
         }
 
-        editCategory(oldName, newName.trim());
-        setEditingCategory(null);
+        try {
+            await editCategory(oldName, newName.trim());
+            setEditingCategory(null);
+        } catch(e) {}
     };
 
     return (

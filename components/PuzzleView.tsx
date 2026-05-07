@@ -26,21 +26,14 @@ const PuzzleView: React.FC<PuzzleViewProps> = ({ puzzle }) => {
         const correct = userAnswer.trim().replace(/\s/g, '') === puzzle.answer.trim().replace(/\s/g, '');
         
         if (correct) {
+            setSubmitted(true);
+            setIsCorrect(true);
+
             if (isAlreadySolved) {
                  addToast(`Correct again! You've already earned points for this puzzle.`, 'success');
-                 setSubmitted(true);
-                 setIsCorrect(true);
             } else {
-                try {
-                    await completePuzzle(puzzle.id, puzzle.points, puzzle.xp);
-                    // Only set these if completePuzzle (the DB write) succeeded
-                    setSubmitted(true);
-                    setIsCorrect(true);
-                    addToast(`Correct! +${puzzle.points} Points and +${puzzle.xp} XP`, 'success');
-                } catch (err) {
-                    // completePuzzle already shows a toast on error
-                    console.error("Submission failed, letting user retry");
-                }
+                addToast(`Correct! +${puzzle.points} Points and +${puzzle.xp} XP`, 'success');
+                await completePuzzle(puzzle.id, puzzle.points, puzzle.xp);
             }
         } else {
             // Keep the form active and just notify the user

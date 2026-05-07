@@ -23,7 +23,16 @@ ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS achievement_ids TEXT[] DEFA
 -- Cleanup legacy table if it exists
 DROP TABLE IF EXISTS public.solved_puzzles CASCADE;
 
--- 2. PUZZLES TABLE
+-- 2A. CATEGORIES TABLE
+DROP TABLE IF EXISTS public.categories CASCADE;
+CREATE TABLE public.categories (
+  name TEXT PRIMARY KEY,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
+
+-- 2B. PUZZLES TABLE
 -- Dropping with CASCADE to handle potential foreign key constraints from other tables.
 DROP TABLE IF EXISTS public.puzzles CASCADE;
 CREATE TABLE public.puzzles (
@@ -35,7 +44,7 @@ CREATE TABLE public.puzzles (
   description TEXT NOT NULL,
   code TEXT NOT NULL,
   answer TEXT NOT NULL,
-  category TEXT NOT NULL,
+  category TEXT NOT NULL REFERENCES public.categories(name) ON UPDATE CASCADE ON DELETE CASCADE,
   required_level INTEGER DEFAULT 1,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
@@ -60,16 +69,63 @@ ALTER TABLE public.achievements ENABLE ROW LEVEL SECURITY;
 DO $$ 
 BEGIN
     DROP POLICY IF EXISTS "Profiles are viewable by everyone" ON public.profiles;
-    CREATE POLICY "Profiles are viewable by everyone" ON profiles FOR SELECT USING (true);
-    
+    DROP POLICY IF EXISTS "Public profiles are viewable by everyone." ON public.profiles;
+    DROP POLICY IF EXISTS "Users can read own profile" ON public.profiles;
     DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
-    CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
+    DROP POLICY IF EXISTS "Users can update their own profile." ON public.profiles;
+    DROP POLICY IF EXISTS "Admins can manage all profiles" ON public.profiles;
+
+    CREATE POLICY "Profiles are viewable by everyone" ON public.profiles FOR SELECT USING (true);
+    
+    CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
     
     DROP POLICY IF EXISTS "Puzzles are viewable by everyone" ON public.puzzles;
-    CREATE POLICY "Puzzles are viewable by everyone" ON puzzles FOR SELECT USING (true);
+    CREATE POLICY "Puzzles are viewable by everyone" ON public.puzzles FOR SELECT USING (true);
     
     DROP POLICY IF EXISTS "Achievements are viewable by everyone" ON public.achievements;
-    CREATE POLICY "Achievements are viewable by everyone" ON achievements FOR SELECT USING (true);
+    CREATE POLICY "Achievements are viewable by everyone" ON public.achievements FOR SELECT USING (true);
+END $$;
+
+-- 5.1 Admin role function to prevent RLS recursion
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS BOOLEAN AS $$
+BEGIN
+  IF auth.uid() IS NULL THEN
+    RETURN FALSE;
+  END IF;
+  
+  RETURN EXISTS (
+    SELECT 1 FROM public.profiles 
+    WHERE id = auth.uid() AND role = 'admin'
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+
+-- 5.2 Admin policies using the security definer function
+DO $$ 
+BEGIN
+    DROP POLICY IF EXISTS "Admins can manage all profiles" ON public.profiles;
+    CREATE POLICY "Admins can manage all profiles" ON public.profiles FOR ALL USING (public.is_admin());
+    
+    CREATE POLICY "Categories are viewable by everyone" ON public.categories FOR SELECT USING (true);
+    
+    DROP POLICY IF EXISTS "Admins can manage categories" ON public.categories;
+    DROP POLICY IF EXISTS "Admins can insert categories" ON public.categories;
+    DROP POLICY IF EXISTS "Admins can update categories" ON public.categories;
+    DROP POLICY IF EXISTS "Admins can delete categories" ON public.categories;
+    CREATE POLICY "Admins can manage categories" ON public.categories FOR ALL USING (public.is_admin());
+    
+    DROP POLICY IF EXISTS "Admins can manage puzzles" ON public.puzzles;
+    DROP POLICY IF EXISTS "Admins can insert puzzles" ON public.puzzles;
+    DROP POLICY IF EXISTS "Admins can update puzzles" ON public.puzzles;
+    DROP POLICY IF EXISTS "Admins can delete puzzles" ON public.puzzles;
+    CREATE POLICY "Admins can manage puzzles" ON public.puzzles FOR ALL USING (public.is_admin());
+    
+    DROP POLICY IF EXISTS "Admins can manage achievements" ON public.achievements;
+    DROP POLICY IF EXISTS "Admins can insert achievements" ON public.achievements;
+    DROP POLICY IF EXISTS "Admins can update achievements" ON public.achievements;
+    DROP POLICY IF EXISTS "Admins can delete achievements" ON public.achievements;
+    CREATE POLICY "Admins can manage achievements" ON public.achievements FOR ALL USING (public.is_admin());
 END $$;
 
 -- 6. AUTH TRIGGER
@@ -88,6 +144,15 @@ CREATE TRIGGER on_auth_user_created
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
 -- 7. SEED DATA
+-- Populate required categories
+INSERT INTO public.categories (name) VALUES 
+('Arrays'),
+('Async'),
+('Objects'),
+('Strings'),
+('Logic')
+ON CONFLICT (name) DO NOTHING;
+
 -- This will populate the puzzles so you actually see some!
 INSERT INTO public.puzzles (id, title, difficulty, points, xp, description, code, answer, category)
 VALUES 
