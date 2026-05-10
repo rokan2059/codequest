@@ -12,6 +12,7 @@ export interface Puzzle {
     answer: string;
     category: string;
     requiredLevel?: number;
+    hint?: string;
 }
 
 export interface Achievement {

@@ -11,7 +11,8 @@ const BLANK_FORM_STATE = {
     code: '',
     answer: '',
     xp: '0',
-    requiredLevel: '1'
+    requiredLevel: '1',
+    hint: ''
 };
 
 const PuzzleManagement: React.FC = () => {
@@ -29,6 +30,7 @@ const PuzzleManagement: React.FC = () => {
                 points: String(editingPuzzle.points),
                 xp: String(editingPuzzle.xp || 0),
                 requiredLevel: String(editingPuzzle.requiredLevel || 1),
+                hint: editingPuzzle.hint || ''
             });
         } else {
             setFormState({
@@ -121,6 +123,7 @@ const PuzzleManagement: React.FC = () => {
                         <textarea name="description" value={formState.description} onChange={handleInputChange} placeholder="Description" className="w-full p-2 bg-gray-900 border border-gray-700 rounded" rows={2}></textarea>
                         <textarea name="code" value={formState.code} onChange={handleInputChange} placeholder="Code Snippet" className="w-full p-2 bg-gray-900 border border-gray-700 rounded font-mono" rows={5} required></textarea>
                         <textarea name="answer" value={formState.answer} onChange={handleInputChange} placeholder="Correct Answer" className="w-full p-2 bg-gray-900 border border-gray-700 rounded font-mono" rows={2} required></textarea>
+                        <textarea name="hint" value={formState.hint} onChange={handleInputChange} placeholder="Hint (Optional, unlockable for -5 points)" className="w-full p-2 bg-gray-900 border border-gray-700 rounded" rows={2}></textarea>
                         <div className="flex gap-4">
                             <select name="difficulty" value={formState.difficulty} onChange={handleInputChange} className="w-full p-2 bg-gray-900 border border-gray-700 rounded">
                                 <option>Easy</option>

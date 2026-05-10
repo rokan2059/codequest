@@ -74,6 +74,7 @@ const AppContext = createContext<{
     completePuzzle: (puzzleId: string, points: number, xpValue: number) => void;
     addAchievement: (achievement: Achievement) => void;
     deleteAchievement: (id: string) => void;
+    deductPoints: (points: number, reason?: string) => Promise<boolean>;
 }>({
     state: initialState,
     dispatch: () => null,
@@ -93,6 +94,7 @@ const AppContext = createContext<{
     completePuzzle: () => {},
     addAchievement: () => {},
     deleteAchievement: () => {},
+    deductPoints: async () => false,
 });
 
 const appReducer = (state: AppState, action: Action): AppState => {
@@ -407,6 +409,30 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         }
     };
 
+    const deductPoints = async (pointsToDeduct: number, reason: string = 'deduction'): Promise<boolean> => {
+        if (!state.user) return false;
+        if (state.user.points < pointsToDeduct) {
+            addToast(`Not enough points. You need ${pointsToDeduct} points but have ${state.user.points}.`, 'error');
+            return false;
+        }
+
+        const updatedUser = {
+            ...state.user,
+            points: state.user.points - pointsToDeduct
+        };
+
+        try {
+            await Auth.updateUser(updatedUser);
+            dispatch({ type: 'LOGIN_SUCCESS', payload: updatedUser });
+            addToast(`-${pointsToDeduct} Points (${reason})`, 'success');
+            return true;
+        } catch (error) {
+            console.error('Failed to deduct points:', error);
+            addToast('An error occurred. Please try again.', 'error');
+            return false;
+        }
+    };
+
     return (
         <AppContext.Provider value={{ 
             state, 
@@ -426,7 +452,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             resetPlayerProgress,
             completePuzzle,
             addAchievement,
-            deleteAchievement
+            deleteAchievement,
+            deductPoints
         }}>
             {children}
         </AppContext.Provider>

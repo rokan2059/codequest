@@ -4,12 +4,14 @@ import { User } from '../../lib/types';
 import UserCircleIcon from '../icons/UserCircleIcon';
 import TrophyIcon from '../icons/TrophyIcon';
 import PuzzleIcon from '../icons/PuzzleIcon';
+import Profile from '../Profile';
 
 const PlayerManagement: React.FC = () => {
-    const { state, dispatch, deletePlayer, resetPlayerProgress, addToast } = useAppContext();
+    const { state, dispatch, addToast } = useAppContext();
     const { players } = state;
     const [searchTerm, setSearchTerm] = useState('');
     const [sortConfig, setSortConfig] = useState<{ key: keyof User; direction: 'asc' | 'desc' } | null>({ key: 'points', direction: 'desc' });
+    const [viewingUserId, setViewingUserId] = useState<string | null>(null);
 
     const filteredPlayers = useMemo(() => {
         return players.filter(player =>
@@ -52,24 +54,18 @@ const PlayerManagement: React.FC = () => {
         return new Date(dateString).toLocaleDateString();
     };
 
-    const handleDelete = (player: User) => {
-        if (window.confirm(`Are you sure you want to delete the account for ${player.email}? This cannot be undone.`)) {
-            deletePlayer(player.id);
-            addToast(`Player ${player.email} deleted successfully.`, 'success');
-        }
-    };
-
-    const handleReset = (player: User) => {
-        if (window.confirm(`Are you sure you want to reset all progress for ${player.email}? Points and solved puzzles will be cleared.`)) {
-            resetPlayerProgress(player.id);
-            addToast(`Progress for ${player.email} has been reset.`, 'success');
-        }
-    };
-
     // Calculate Summary Stats
     const totalPlayers = players.filter(p => p.role === 'player').length;
     const totalXP = players.reduce((sum, p) => p.role === 'player' ? sum + p.points : sum, 0);
     const totalSolved = players.reduce((sum, p) => p.role === 'player' ? sum + p.solvedPuzzleIds.length : sum, 0);
+
+    if (viewingUserId) {
+        return (
+            <div className="min-h-screen bg-gradient-to-b from-gray-900 to-slate-900 text-white p-4 sm:p-6 lg:p-8 fade-in relative">
+                <Profile userId={viewingUserId} onClose={() => setViewingUserId(null)} />
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-900 to-slate-900 text-white p-4 sm:p-6 lg:p-8 fade-in">
@@ -113,16 +109,19 @@ const PlayerManagement: React.FC = () => {
                         <thead className="bg-slate-800 text-slate-400 text-sm uppercase font-semibold tracking-wider">
                             <tr>
                                 <th className="p-4 cursor-pointer hover:text-white transition-colors" onClick={() => requestSort('email')}>Player {getSortIndicator('email')}</th>
-                                <th className="p-4 cursor-pointer hover:text-white transition-colors text-center" onClick={() => requestSort('id')}>Joined {getSortIndicator('id')}</th>
+                                <th className="p-4 cursor-pointer hover:text-white transition-colors text-center" onClick={() => requestSort('created_at')}>Joined {getSortIndicator('created_at')}</th>
                                 <th className="p-4 cursor-pointer hover:text-white transition-colors text-center" onClick={() => requestSort('level')}>Level {getSortIndicator('level')}</th>
                                 <th className="p-4 cursor-pointer hover:text-white transition-colors text-right" onClick={() => requestSort('points')}>XP {getSortIndicator('points')}</th>
-                                <th className="p-4 text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-700">
                             {sortedPlayers.length > 0 ? (
                                 sortedPlayers.map(player => (
-                                    <tr key={player.id} className="hover:bg-slate-800/80 transition-colors group">
+                                    <tr 
+                                        key={player.id} 
+                                        className="hover:bg-slate-800/80 transition-colors group cursor-pointer"
+                                        onClick={() => setViewingUserId(player.id)}
+                                    >
                                         <td className="p-4">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-300 font-bold border border-blue-500/30">
@@ -142,29 +141,11 @@ const PlayerManagement: React.FC = () => {
                                         <td className="p-4 text-right font-mono text-yellow-500 font-bold">
                                             {player.points.toLocaleString()}
                                         </td>
-                                        <td className="p-4 text-center">
-                                            <div className="flex items-center justify-center gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button 
-                                                    onClick={() => handleReset(player)}
-                                                    className="px-3 py-1.5 text-xs font-medium text-yellow-300 bg-yellow-900/30 border border-yellow-800 hover:bg-yellow-900/50 rounded transition-colors"
-                                                    title="Reset Level and Points"
-                                                >
-                                                    Reset
-                                                </button>
-                                                <button 
-                                                    onClick={() => handleDelete(player)}
-                                                    className="px-3 py-1.5 text-xs font-medium text-red-300 bg-red-900/30 border border-red-800 hover:bg-red-900/50 rounded transition-colors"
-                                                    title="Delete Account"
-                                                >
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={5} className="p-12 text-center text-slate-500">
+                                    <td colSpan={4} className="p-12 text-center text-slate-500">
                                         <p className="text-lg">No players found matching your search.</p>
                                     </td>
                                 </tr>

@@ -12,7 +12,8 @@ export const puzzles: Record<string, Puzzle[]> = {
             description: 'What will be logged to the console?',
             code: `let x = 10;\nfunction checkScope() {\n  let x = 20;\n}\ncheckScope();\nconsole.log(x);`,
             answer: '10',
-            requiredLevel: 1
+            requiredLevel: 1,
+            hint: 'The inner x is scoped to the function and does not modify the outer x.'
         },
         { 
             id: 'js2',
@@ -24,7 +25,8 @@ export const puzzles: Record<string, Puzzle[]> = {
             description: 'What is the result of this expression?',
             code: `console.log(1 + "2" + 3);`,
             answer: '123',
-            requiredLevel: 1
+            requiredLevel: 1,
+            hint: 'When you add a number to a string in JS, it concatenates them.'
         },
         { 
             id: 'js3',
@@ -36,7 +38,8 @@ export const puzzles: Record<string, Puzzle[]> = {
             description: 'What will this code log to the console?',
             code: `function outer() {\n  let count = 0;\n  return function inner() {\n    count++;\n    return count;\n  }\n}\nconst counter = outer();\nconsole.log(counter());\nconsole.log(counter());`,
             answer: '1\n2',
-            requiredLevel: 10
+            requiredLevel: 10,
+            hint: 'The inner function remembers the variables from its outer scope.'
         },
     ],
     'Array Methods': [
@@ -50,7 +53,8 @@ export const puzzles: Record<string, Puzzle[]> = {
             description: 'What will `newArray` contain after this code runs?',
             code: `const arr = [1, 2, 3];\nconst newArray = arr.map(num => num * 2);\nconsole.log(newArray);`,
             answer: '[2,4,6]',
-            requiredLevel: 10
+            requiredLevel: 10,
+            hint: 'The map method creates a new array populated with the results of calling a provided function on every element.'
         },
     ],
     'Asynchronous JS': [
@@ -64,7 +68,8 @@ export const puzzles: Record<string, Puzzle[]> = {
             description: 'In what order will the numbers be logged?',
             code: `console.log(1);\nsetTimeout(() => console.log(2), 0);\nPromise.resolve().then(() => console.log(3));\nconsole.log(4);`,
             answer: '1\n4\n3\n2',
-            requiredLevel: 25
+            requiredLevel: 25,
+            hint: 'Microtasks (Promises) run before Macrotasks (setTimeout).'
         },
     ],
 };

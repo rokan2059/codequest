@@ -46,7 +46,8 @@ export const getPlayers = async (): Promise<User[]> => {
         level: profile.level,
         xpToNextLevel: calculateLevel(calculateTotalXp(profile.level, profile.xp)).xpToNextLevel,
         solvedPuzzleIds: profile.solved_puzzle_ids || [],
-        achievements: profile.achievement_ids || []
+        achievements: profile.achievement_ids || [],
+        created_at: profile.created_at
     }));
 };
 
@@ -81,7 +82,8 @@ export const login = async (email: string, password: string): Promise<{ success:
         level: profileNode.level,
         xpToNextLevel: levelInfo.xpToNextLevel,
         solvedPuzzleIds: profileNode.solved_puzzle_ids || [],
-        achievements: profileNode.achievement_ids || []
+        achievements: profileNode.achievement_ids || [],
+        created_at: profileNode.created_at
     };
 
     return { success: true, message: 'Login successful!', user };
@@ -143,7 +145,8 @@ export const getLoggedInUser = async (): Promise<User | null> => {
         level: profile.level,
         xpToNextLevel: levelInfo.xpToNextLevel,
         solvedPuzzleIds: profile.solved_puzzle_ids || [],
-        achievements: profile.achievement_ids || []
+        achievements: profile.achievement_ids || [],
+        created_at: profile.created_at
     };
 };
 

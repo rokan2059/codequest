@@ -6,26 +6,33 @@ import ChartBarIcon from './icons/ChartBarIcon';
 import { useAppContext } from '../context/AppContext';
 import { makeUserAdmin } from '../lib/auth';
 
-const Profile: React.FC = () => {
+interface ProfileProps {
+    userId?: string;
+    onClose?: () => void;
+}
+
+const Profile: React.FC<ProfileProps> = ({ userId, onClose }) => {
     const { state, dispatch, addToast } = useAppContext();
-    const { user, players, achievements } = state;
+    const { players, achievements } = state;
+    
+    const displayUser = userId ? players.find(p => p.id === userId) : state.user;
     const [isUpgrading, setIsUpgrading] = useState(false);
 
-    if (!user) return null;
+    if (!displayUser) return null;
 
     const sortedPlayers = [...players].filter(p => p.role === 'player').sort((a, b) => b.points - a.points);
-    const userRank = sortedPlayers.findIndex(p => p.id === user.id) + 1;
+    const userRank = sortedPlayers.findIndex(p => p.id === displayUser.id) + 1;
     
-    const userAchievements = achievements.filter(ach => user.achievements.includes(ach.id));
-    const xpProgress = user.xpToNextLevel > 0 ? (user.xp / user.xpToNextLevel) * 100 : 0;
+    const userAchievements = achievements.filter(ach => displayUser.achievements.includes(ach.id));
+    const xpProgress = displayUser.xpToNextLevel > 0 ? (displayUser.xp / displayUser.xpToNextLevel) * 100 : 0;
 
     const handleMakeAdmin = async () => {
         setIsUpgrading(true);
         try {
-            await makeUserAdmin(user.id);
+            await makeUserAdmin(displayUser.id);
             addToast('Upgraded profile to Admin! Logging you back in automatically...', 'success');
             // Optimistically update context to see the admin view instantly
-            dispatch({ type: 'LOGIN_SUCCESS', payload: { ...user, role: 'admin' } });
+            dispatch({ type: 'LOGIN_SUCCESS', payload: { ...displayUser, role: 'admin' } });
         } catch (error: any) {
             addToast('Failed to make you an admin.', 'error');
         } finally {
@@ -34,14 +41,23 @@ const Profile: React.FC = () => {
     };
 
     return (
-        <div className="container mx-auto max-w-4xl">
-            <div className="text-center mb-10">
+        <div className="container mx-auto max-w-4xl relative">
+            {onClose && (
+                <button 
+                    onClick={onClose} 
+                    className="absolute top-0 right-0 p-2 text-slate-400 hover:text-white transition-colors"
+                    title="Close"
+                >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            )}
+            <div className="text-center mb-10 pt-4">
                 <div className="w-24 h-24 rounded-full bg-sky-500/20 mx-auto flex items-center justify-center border-2 border-sky-400 mb-4">
-                     <span className="text-4xl font-bold text-slate-100">{user.email.charAt(0).toUpperCase()}</span>
+                     <span className="text-4xl font-bold text-slate-100">{displayUser.email.charAt(0).toUpperCase()}</span>
                 </div>
-                <h1 className="text-4xl font-bold text-slate-100">{user.email}</h1>
-                <p className="text-lg text-slate-400">Level {user.level} {user.role === 'admin' ? '(Admin)' : ''}</p>
-                {user.role !== 'admin' && (
+                <h1 className="text-4xl font-bold text-slate-100">{displayUser.email}</h1>
+                <p className="text-lg text-slate-400">Level {displayUser.level} {displayUser.role === 'admin' ? '(Admin)' : ''}</p>
+                {displayUser.role !== 'admin' && !userId && (
                     <button 
                         onClick={handleMakeAdmin}
                         disabled={isUpgrading}
@@ -55,7 +71,7 @@ const Profile: React.FC = () => {
             {/* XP Bar */}
             <div className="mb-10 px-4">
                 <div className="flex justify-between text-sm text-slate-400 mb-1">
-                    <span>XP: {user.xp} / {user.xpToNextLevel}</span>
+                    <span>XP: {displayUser.xp} / {displayUser.xpToNextLevel}</span>
                     <span>Next Level</span>
                 </div>
                 <div className="w-full bg-slate-700 rounded-full h-2.5">
@@ -72,12 +88,12 @@ const Profile: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
                 <div className="bg-slate-800 p-6 rounded-lg border border-slate-700 text-center">
                     <PuzzleIcon className="w-10 h-10 mx-auto text-sky-400 mb-2" />
-                    <p className="text-3xl font-bold text-slate-100">{user.solvedPuzzleIds.length}</p>
+                    <p className="text-3xl font-bold text-slate-100">{displayUser.solvedPuzzleIds ? displayUser.solvedPuzzleIds.length : 0}</p>
                     <p className="text-slate-400">Puzzles Solved</p>
                 </div>
                 <div className="bg-slate-800 p-6 rounded-lg border border-slate-700 text-center">
                     <TrophyIcon className="w-10 h-10 mx-auto text-yellow-400 mb-2" />
-                    <p className="text-3xl font-bold text-slate-100">{user.points}</p>
+                    <p className="text-3xl font-bold text-slate-100">{displayUser.points}</p>
                     <p className="text-slate-400">Total Points</p>
                 </div>
                 <div className="bg-slate-800 p-6 rounded-lg border border-slate-700 text-center">
