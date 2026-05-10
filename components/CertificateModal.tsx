@@ -171,7 +171,7 @@ const CertificateModal: React.FC<CertificateModalProps> = ({ user, onClose }) =>
                                             <div className="absolute bottom-6 left-0 right-0 flex justify-center items-center gap-6 px-12">
                                                 <div className="flex-shrink-0 bg-white p-1 rounded border border-slate-200">
                                                     <QRCode 
-                                                        value={`https://codequest.app/verify/${user.certificate_id}`}
+                                                        value={`https://codequest-dodv.onrender.com/?verify_cert=${user.certificate_id}`}
                                                         size={56}
                                                         level="L"
                                                     />
@@ -179,7 +179,7 @@ const CertificateModal: React.FC<CertificateModalProps> = ({ user, onClose }) =>
                                                 <div className="text-left">
                                                     <p className="text-xs text-slate-500 font-semibold uppercase tracking-widest mb-1">Authenticity Verification</p>
                                                     <p className="text-[10px] text-slate-400 font-mono break-all max-w-[200px]">ID: {user.certificate_id}</p>
-                                                    <p className="text-[10px] text-slate-400 font-mono max-w-[250px]">Verify at: codequest.app/verify</p>
+                                                    <p className="text-[10px] text-slate-400 font-mono max-w-[250px]">Verify at: codequest-dodv.onrender.com</p>
                                                 </div>
                                             </div>
                                         )}
