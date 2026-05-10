@@ -1,5 +1,5 @@
 
-export type View = 'login' | 'admin_dashboard' | 'player_dashboard' | 'puzzles' | 'leaderboard' | 'profile' | 'puzzle_view' | 'reset_password';
+export type View = 'login' | 'admin_dashboard' | 'player_dashboard' | 'puzzles' | 'leaderboard' | 'profile' | 'puzzle_view' | 'reset_password' | 'verify_cert';
 
 export interface Puzzle {
     id: string;
@@ -35,4 +35,7 @@ export interface User {
     solvedPuzzleIds: string[];
     achievements: string[]; // Array of achievement IDs
     created_at?: string;
+    certificate_id?: string;
+    certificate_name?: string;
+    certificate_issued_at?: string;
 }

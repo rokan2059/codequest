@@ -77,18 +77,18 @@ const PlayerManagement: React.FC = () => {
                     <h1 className="text-3xl font-bold text-gray-100">Player Management</h1>
                  </div>
                  
-                 <div className="flex gap-4">
-                     <div className="flex items-center gap-2 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700">
-                        <UserCircleIcon className="w-5 h-5 text-blue-400" />
-                        <span className="font-bold">{totalPlayers}</span> <span className="text-sm text-slate-400">Players</span>
+                 <div className="flex flex-wrap gap-4 mt-4 md:mt-0">
+                     <div className="flex items-center gap-2 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700 grow justify-center md:grow-0">
+                        <UserCircleIcon className="w-5 h-5 text-blue-400 shrink-0" />
+                        <span className="font-bold shrink-0">{totalPlayers}</span> <span className="text-sm text-slate-400 shrink-0">Players</span>
                      </div>
-                     <div className="flex items-center gap-2 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700">
-                        <TrophyIcon className="w-5 h-5 text-yellow-400" />
-                        <span className="font-bold">{totalXP}</span> <span className="text-sm text-slate-400">Total XP</span>
+                     <div className="flex items-center gap-2 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700 grow justify-center md:grow-0">
+                        <TrophyIcon className="w-5 h-5 text-yellow-400 shrink-0" />
+                        <span className="font-bold shrink-0">{totalXP}</span> <span className="text-sm text-slate-400 shrink-0">Total XP</span>
                      </div>
-                     <div className="flex items-center gap-2 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700">
-                        <PuzzleIcon className="w-5 h-5 text-green-400" />
-                        <span className="font-bold">{totalSolved}</span> <span className="text-sm text-slate-400">Solved</span>
+                     <div className="flex items-center gap-2 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700 grow justify-center md:grow-0">
+                        <PuzzleIcon className="w-5 h-5 text-green-400 shrink-0" />
+                        <span className="font-bold shrink-0">{totalSolved}</span> <span className="text-sm text-slate-400 shrink-0">Solved</span>
                      </div>
                  </div>
             </header>
@@ -105,7 +105,7 @@ const PlayerManagement: React.FC = () => {
 
             <div className="bg-slate-800/50 backdrop-blur-md rounded-xl border border-slate-700 shadow-xl overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
+                    <table className="w-full text-left border-collapse min-w-max">
                         <thead className="bg-slate-800 text-slate-400 text-sm uppercase font-semibold tracking-wider">
                             <tr>
                                 <th className="p-4 cursor-pointer hover:text-white transition-colors" onClick={() => requestSort('email')}>Player {getSortIndicator('email')}</th>
@@ -124,7 +124,7 @@ const PlayerManagement: React.FC = () => {
                                     >
                                         <td className="p-4">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-300 font-bold border border-blue-500/30">
+                                                <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-300 font-bold border border-blue-500/30 shrink-0">
                                                     {player.email.charAt(0).toUpperCase()}
                                                 </div>
                                                 <span className="font-medium text-slate-200">{player.email}</span>

@@ -20,8 +20,16 @@ const pageTransition: Transition = {
 };
 
 const App: React.FC = () => {
-    const { state } = useAppContext();
+    const { state, dispatch } = useAppContext();
     const { user } = state;
+
+    React.useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const verifyId = params.get('verify_cert');
+        if (verifyId) {
+            dispatch({ type: 'SET_VIEW', payload: 'verify_cert' });
+        }
+    }, [dispatch]);
 
     return (
         <div className="min-h-screen w-full bg-background">

@@ -6,8 +6,13 @@ import * as PuzzleService from '../lib/puzzleService';
 import * as AchievementService from '../lib/achievementService';
 import { achievements as achievementData } from '../data/achievements';
 
-type AdminView = 'main' | 'puzzle_management' | 'category_management' | 'player_management' | 'achievement_management';
+type AdminView = 'main' | 'puzzle_management' | 'category_management' | 'player_management' | 'achievement_management' | 'settings_management';
 type ToastMessage = { id: number; message: string; type: 'success' | 'error' };
+
+export interface CertificateRequirements {
+    level: number;
+    puzzles: number;
+}
 
 interface AppState {
     user: User | null;
@@ -19,6 +24,7 @@ interface AppState {
     achievements: Achievement[];
     players: User[];
     toasts: ToastMessage[];
+    certificateRequirements: CertificateRequirements;
 }
 
 type Action =
@@ -41,7 +47,8 @@ type Action =
     | { type: 'ADD_TOAST'; payload: { message: string; type: 'success' | 'error' } }
     | { type: 'REMOVE_TOAST'; payload: number }
     | { type: 'ADD_ACHIEVEMENT'; payload: Achievement }
-    | { type: 'DELETE_ACHIEVEMENT'; payload: string };
+    | { type: 'DELETE_ACHIEVEMENT'; payload: string }
+    | { type: 'SET_CERTIFICATE_REQUIREMENTS'; payload: CertificateRequirements };
 
 const initialState: AppState = {
     user: null,
@@ -53,6 +60,7 @@ const initialState: AppState = {
     achievements: achievementData,
     players: [],
     toasts: [],
+    certificateRequirements: { level: 10, puzzles: 10 }
 };
 
 const AppContext = createContext<{
@@ -75,6 +83,7 @@ const AppContext = createContext<{
     addAchievement: (achievement: Achievement) => void;
     deleteAchievement: (id: string) => void;
     deductPoints: (points: number, reason?: string) => Promise<boolean>;
+    updateCertificateRequirements: (req: CertificateRequirements) => void;
 }>({
     state: initialState,
     dispatch: () => null,
@@ -95,6 +104,7 @@ const AppContext = createContext<{
     addAchievement: () => {},
     deleteAchievement: () => {},
     deductPoints: async () => false,
+    updateCertificateRequirements: () => {},
 });
 
 const appReducer = (state: AppState, action: Action): AppState => {
@@ -184,6 +194,11 @@ const appReducer = (state: AppState, action: Action): AppState => {
                 ...state,
                 toasts: state.toasts.filter(toast => toast.id !== action.payload),
             };
+        case 'SET_CERTIFICATE_REQUIREMENTS':
+            return {
+                ...state,
+                certificateRequirements: action.payload
+            };
         default:
             return state;
     }
@@ -196,6 +211,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         const initData = async () => {
             try {
                 console.log('Initializing data...');
+                const storedReq = localStorage.getItem('applet_certificate_req');
+                if (storedReq) {
+                    try {
+                        const parsedReq = JSON.parse(storedReq);
+                        dispatch({ type: 'SET_CERTIFICATE_REQUIREMENTS', payload: parsedReq });
+                    } catch (e) {
+                        console.error('Failed to parse certificate requirements:', e);
+                    }
+                }
+
                 const puzzles = await PuzzleService.getPuzzles();
                 const players = await Auth.getPlayers();
                 const achievements = await AchievementService.getAchievements();
@@ -433,6 +458,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         }
     };
 
+    const updateCertificateRequirements = (req: CertificateRequirements) => {
+        localStorage.setItem('applet_certificate_req', JSON.stringify(req));
+        dispatch({ type: 'SET_CERTIFICATE_REQUIREMENTS', payload: req });
+        addToast('Certificate requirements updated successfully.');
+    };
+
     return (
         <AppContext.Provider value={{ 
             state, 
@@ -453,7 +484,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             completePuzzle,
             addAchievement,
             deleteAchievement,
-            deductPoints
+            deductPoints,
+            updateCertificateRequirements
         }}>
             {children}
         </AppContext.Provider>

@@ -20,6 +20,11 @@ ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS level INTEGER DEFAULT 1;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS solved_puzzle_ids TEXT[] DEFAULT '{}';
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS achievement_ids TEXT[] DEFAULT '{}';
 
+-- Anti-Theft / Certificate Verification fields
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS certificate_id TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS certificate_name TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS certificate_issued_at TIMESTAMP WITH TIME ZONE;
+
 -- Cleanup legacy table if it exists
 DROP TABLE IF EXISTS public.solved_puzzles CASCADE;
 

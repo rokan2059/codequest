@@ -9,6 +9,7 @@ import Profile from './Profile';
 import PuzzleView from './PuzzleView';
 import LoginPage from './LoginPage';
 import ResetPassword from './ResetPassword';
+import VerifyCertificate from './VerifyCertificate';
 import { useAppContext } from '../context/AppContext';
 import { View } from '../lib/types';
 
@@ -34,12 +35,13 @@ const PlayerLayout: React.FC = () => {
         switch(view) {
             case 'login': return <LoginPage />;
             case 'reset_password': return <ResetPassword />;
-            case 'player_dashboard': return <PlayerDashboard />;
-            case 'puzzles': return <PuzzleList />;
-            case 'leaderboard': return <Leaderboard />;
+            case 'verify_cert': return <VerifyCertificate />;
+            case 'player_dashboard': return user ? <PlayerDashboard /> : <LoginPage />;
+            case 'puzzles': return user ? <PuzzleList /> : <LoginPage />;
+            case 'leaderboard': return user ? <Leaderboard /> : <LoginPage />;
             case 'profile': return user ? <Profile /> : <LoginPage />;
-            case 'puzzle_view': return currentPuzzle ? <PuzzleView puzzle={currentPuzzle} /> : <PuzzleList />;
-            default: return <PlayerDashboard />;
+            case 'puzzle_view': return user && currentPuzzle ? <PuzzleView puzzle={currentPuzzle} /> : <PuzzleList />;
+            default: return user ? <PlayerDashboard /> : <LoginPage />;
         }
     };
 

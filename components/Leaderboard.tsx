@@ -30,21 +30,23 @@ const Leaderboard: React.FC = () => {
                             const isCurrentUser = player.id === user?.id;
 
                             return (
-                                <li key={player.id} className={`flex items-center p-4 ${isCurrentUser ? 'bg-blue-900/50' : ''} ${index === 0 ? 'rounded-t-xl' : ''} ${index === sortedPlayers.length - 1 ? 'rounded-b-xl' : ''}`}>
-                                    <div className="flex items-center w-1/6">
-                                        <span className={`text-2xl font-bold w-10 text-center ${getRankColor(rank)}`}>
-                                            {rank}
-                                        </span>
-                                        {rank <= 3 && <TrophyIcon className={`w-6 h-6 ml-2 ${getRankColor(rank)}`} />}
+                                <li key={player.id} className={`flex items-center justify-between p-4 ${isCurrentUser ? 'bg-blue-900/50' : ''} ${index === 0 ? 'rounded-t-xl' : ''} ${index === sortedPlayers.length - 1 ? 'rounded-b-xl' : ''}`}>
+                                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                                        <div className="flex items-center justify-center shrink-0 w-12">
+                                            <span className={`text-xl sm:text-2xl font-bold ${getRankColor(rank)}`}>
+                                                {rank}
+                                            </span>
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-base sm:text-lg font-medium text-gray-100 truncate flex items-center gap-2">
+                                                {player.email}
+                                                {rank <= 3 && <TrophyIcon className={`w-5 h-5 hidden sm:block ${getRankColor(rank)}`} />}
+                                                {isCurrentUser && <span className="text-xs text-blue-400 shrink-0">(You)</span>}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div className="w-4/6">
-                                        <p className="text-lg font-medium text-gray-100 truncate">
-                                            {player.email}
-                                            {isCurrentUser && <span className="text-xs text-blue-400 ml-2">(You)</span>}
-                                        </p>
-                                    </div>
-                                    <div className="w-1/6 text-right">
-                                        <p className="text-xl font-semibold text-blue-400">{(player.points || 0).toLocaleString()}</p>
+                                    <div className="text-right shrink-0 ml-4">
+                                        <p className="text-lg sm:text-xl font-semibold text-blue-400">{(player.points || 0).toLocaleString()}</p>
                                         <p className="text-xs font-medium text-gray-500">{(player.xp || 0).toLocaleString()} XP</p>
                                     </div>
                                 </li>

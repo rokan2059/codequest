@@ -5,6 +5,7 @@ import PuzzleIcon from './icons/PuzzleIcon';
 import ChartBarIcon from './icons/ChartBarIcon';
 import { useAppContext } from '../context/AppContext';
 import { makeUserAdmin } from '../lib/auth';
+import CertificateModal from './CertificateModal';
 
 interface ProfileProps {
     userId?: string;
@@ -17,6 +18,7 @@ const Profile: React.FC<ProfileProps> = ({ userId, onClose }) => {
     
     const displayUser = userId ? players.find(p => p.id === userId) : state.user;
     const [isUpgrading, setIsUpgrading] = useState(false);
+    const [showCertificate, setShowCertificate] = useState(false);
 
     if (!displayUser) return null;
 
@@ -66,6 +68,17 @@ const Profile: React.FC<ProfileProps> = ({ userId, onClose }) => {
                         {isUpgrading ? 'Upgrading...' : 'Make Me Admin (Dev Only)'}
                     </button>
                 )}
+                <div className="mt-6">
+                    <button 
+                        onClick={() => setShowCertificate(true)}
+                        className="px-6 py-2 bg-yellow-600 hover:bg-yellow-500 text-white font-semibold rounded-full shadow-lg transition-all hover:scale-105 flex items-center gap-2 mx-auto uppercase tracking-wide text-sm border-2 border-yellow-400/50"
+                    >
+                        <svg className="w-5 h-5 text-yellow-200" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                        </svg>
+                        View Certificate
+                    </button>
+                </div>
             </div>
 
             {/* XP Bar */}
@@ -125,6 +138,13 @@ const Profile: React.FC<ProfileProps> = ({ userId, onClose }) => {
                     )}
                 </div>
             </div>
+
+            {showCertificate && (
+                <CertificateModal 
+                    user={displayUser} 
+                    onClose={() => setShowCertificate(false)} 
+                />
+            )}
         </div>
     );
 };
