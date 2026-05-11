@@ -4,13 +4,15 @@ import { useAppContext } from '../context/AppContext';
 import { supabase } from '../lib/supabase';
 
 const LoginPage: React.FC = () => {
-    const { login, signup, addToast, dispatch } = useAppContext();
+    const { login, signup, logout, addToast, dispatch } = useAppContext();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isSigningUp, setIsSigningUp] = useState(false);
     const [isForgotPassword, setIsForgotPassword] = useState(false);
+    const [logoClicks, setLogoClicks] = useState(0);
+    const [isAdminMode, setIsAdminMode] = useState(false);
 
     const validateEmail = (email: string) => {
         return /\S+@\S+\.\S+/.test(email);
@@ -56,6 +58,19 @@ const LoginPage: React.FC = () => {
         setIsLoading(false);
 
         if (result.success && result.user) {
+            if (result.user.role === 'admin' && !isAdminMode) {
+                // Prevent admin from logging in via the user portal
+                await logout();
+                addToast('Access denied: Admins must use the Admin Portal.', 'error');
+                return;
+            }
+            if (result.user.role !== 'admin' && isAdminMode) {
+                // Prevent user from logging in via the admin portal
+                await logout();
+                addToast('Access denied: Invalid admin credentials.', 'error');
+                return;
+            }
+
             addToast(result.message);
             dispatch({ type: 'LOGIN_SUCCESS', payload: result.user });
         } else {
@@ -106,18 +121,30 @@ const LoginPage: React.FC = () => {
         setConfirmPassword('');
     };
 
+    const handleLogoClick = () => {
+        setLogoClicks(prev => {
+            const newCount = prev + 1;
+            if (newCount >= 3) {
+                setIsAdminMode(true);
+            }
+            return newCount;
+        });
+    };
+
     return (
         <div className="flex items-center justify-center min-h-screen bg-background p-4">
             <div className="w-full max-w-md bg-background backdrop-blur-lg rounded-2xl shadow-2xl p-8 space-y-6 border border-primary">
                 <div className="flex flex-col items-center space-y-4">
-                    <LogoIcon />
+                    <button onClick={handleLogoClick} className="focus:outline-none transition-transform active:scale-95 bg-transparent border-none p-0 cursor-pointer">
+                        <LogoIcon />
+                    </button>
                     <h1 className="text-3xl font-bold text-gray-100">
-                        {isForgotPassword ? 'Reset Password' : (isSigningUp ? 'Create Account' : 'Welcome Back')}
+                        {isForgotPassword ? 'Reset Password' : (isAdminMode ? 'Admin Portal' : (isSigningUp ? 'Create Account' : 'Welcome Back'))}
                     </h1>
                     <p className="text-gray-400 text-center">
                         {isForgotPassword 
                             ? 'Enter your email to receive a reset link' 
-                            : (isSigningUp ? 'Join the CodeQuest Arena and start solving puzzles.' : 'Sign in to access your dashboard')}
+                            : (isAdminMode ? 'Sign in to access the admin dashboard' : (isSigningUp ? 'Join the CodeQuest Arena and start solving puzzles.' : 'Sign in to access your dashboard'))}
                     </p>
                 </div>
 
@@ -231,19 +258,6 @@ const LoginPage: React.FC = () => {
                         {isSigningUp ? 'Sign in' : 'Sign up'}
                     </button>
                 </p>
-
-                <div className="relative !mt-8">
-                    <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-gray-600"></div>
-                    </div>
-                    <div className="relative flex justify-center text-sm">
-                        <span className="px-2 bg-gray-800 text-gray-500">Or continue with</span>
-                    </div>
-                </div>
-
-                <div className="flex justify-center mt-6">
-                     <p className="text-xs text-gray-500">Secure Admin Portal Access Required for Advanced Features</p>
-                </div>
             </div>
         </div>
     );

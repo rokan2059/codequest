@@ -4,7 +4,6 @@ import TrophyIcon from './icons/TrophyIcon';
 import PuzzleIcon from './icons/PuzzleIcon';
 import ChartBarIcon from './icons/ChartBarIcon';
 import { useAppContext } from '../context/AppContext';
-import { makeUserAdmin } from '../lib/auth';
 import CertificateModal from './CertificateModal';
 
 interface ProfileProps {
@@ -17,7 +16,6 @@ const Profile: React.FC<ProfileProps> = ({ userId, onClose }) => {
     const { players, achievements } = state;
     
     const displayUser = userId ? players.find(p => p.id === userId) : state.user;
-    const [isUpgrading, setIsUpgrading] = useState(false);
     const [showCertificate, setShowCertificate] = useState(false);
 
     if (!displayUser) return null;
@@ -27,20 +25,6 @@ const Profile: React.FC<ProfileProps> = ({ userId, onClose }) => {
     
     const userAchievements = achievements.filter(ach => displayUser.achievements.includes(ach.id));
     const xpProgress = displayUser.xpToNextLevel > 0 ? (displayUser.xp / displayUser.xpToNextLevel) * 100 : 0;
-
-    const handleMakeAdmin = async () => {
-        setIsUpgrading(true);
-        try {
-            await makeUserAdmin(displayUser.id);
-            addToast('Upgraded profile to Admin! Logging you back in automatically...', 'success');
-            // Optimistically update context to see the admin view instantly
-            dispatch({ type: 'LOGIN_SUCCESS', payload: { ...displayUser, role: 'admin' } });
-        } catch (error: any) {
-            addToast('Failed to make you an admin.', 'error');
-        } finally {
-            setIsUpgrading(false);
-        }
-    };
 
     return (
         <div className="container mx-auto max-w-4xl relative">
@@ -59,15 +43,6 @@ const Profile: React.FC<ProfileProps> = ({ userId, onClose }) => {
                 </div>
                 <h1 className="text-4xl font-bold text-slate-100">{displayUser.email}</h1>
                 <p className="text-lg text-slate-400">Level {displayUser.level} {displayUser.role === 'admin' ? '(Admin)' : ''}</p>
-                {displayUser.role !== 'admin' && !userId && (
-                    <button 
-                        onClick={handleMakeAdmin}
-                        disabled={isUpgrading}
-                        className="mt-4 text-xs bg-red-900/40 hover:bg-red-800 text-red-200 py-1 px-3 rounded border border-red-800/50 transition-colors"
-                    >
-                        {isUpgrading ? 'Upgrading...' : 'Make Me Admin (Dev Only)'}
-                    </button>
-                )}
                 <div className="mt-6">
                     <button 
                         onClick={() => setShowCertificate(true)}
