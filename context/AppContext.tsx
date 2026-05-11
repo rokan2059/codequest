@@ -4,6 +4,7 @@ import * as Auth from '../lib/auth';
 import { supabase } from '../lib/supabase';
 import * as PuzzleService from '../lib/puzzleService';
 import * as AchievementService from '../lib/achievementService';
+import * as SettingsService from '../lib/settingsService';
 import { achievements as achievementData } from '../data/achievements';
 
 type AdminView = 'main' | 'puzzle_management' | 'category_management' | 'player_management' | 'achievement_management' | 'settings_management';
@@ -25,6 +26,7 @@ interface AppState {
     players: User[];
     toasts: ToastMessage[];
     certificateRequirements: CertificateRequirements;
+    isInitialized: boolean;
 }
 
 type Action =
@@ -60,7 +62,8 @@ const initialState: AppState = {
     achievements: achievementData,
     players: [],
     toasts: [],
-    certificateRequirements: { level: 10, puzzles: 10 }
+    certificateRequirements: { level: 10, puzzles: 10 },
+    isInitialized: false
 };
 
 const AppContext = createContext<{
@@ -110,11 +113,13 @@ const AppContext = createContext<{
 const appReducer = (state: AppState, action: Action): AppState => {
     switch (action.type) {
         case 'INITIALIZE_DATA':
+            const filteredAchievements = action.payload.achievements.filter(a => a.id !== '__APPLET_SETTINGS__');
             return {
                 ...state,
                 puzzles: action.payload.puzzles,
                 players: action.payload.players,
-                achievements: action.payload.achievements,
+                achievements: filteredAchievements,
+                isInitialized: true
             };
         case 'LOGIN_SUCCESS':
             // Only change view if current view is login or undefined to prevent redirect from active screens
@@ -211,13 +216,19 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         const initData = async () => {
             try {
                 console.log('Initializing data...');
-                const storedReq = localStorage.getItem('applet_certificate_req');
-                if (storedReq) {
-                    try {
-                        const parsedReq = JSON.parse(storedReq);
-                        dispatch({ type: 'SET_CERTIFICATE_REQUIREMENTS', payload: parsedReq });
-                    } catch (e) {
-                        console.error('Failed to parse certificate requirements:', e);
+                const dbSettings = await SettingsService.loadSettings();
+                if (dbSettings) {
+                    dispatch({ type: 'SET_CERTIFICATE_REQUIREMENTS', payload: dbSettings });
+                } else {
+                    const storedReq = localStorage.getItem('applet_certificate_req');
+                    if (storedReq) {
+                        try {
+                            const parsedReq = JSON.parse(storedReq);
+                            dispatch({ type: 'SET_CERTIFICATE_REQUIREMENTS', payload: parsedReq });
+                            await SettingsService.saveSettings(parsedReq);
+                        } catch (e) {
+                            console.error('Failed to parse certificate requirements:', e);
+                        }
                     }
                 }
 
@@ -458,7 +469,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         }
     };
 
-    const updateCertificateRequirements = (req: CertificateRequirements) => {
+    const updateCertificateRequirements = async (req: CertificateRequirements) => {
+        // Save to DB and fallback to local storage
+        await SettingsService.saveSettings(req);
         localStorage.setItem('applet_certificate_req', JSON.stringify(req));
         dispatch({ type: 'SET_CERTIFICATE_REQUIREMENTS', payload: req });
         addToast('Certificate requirements updated successfully.');

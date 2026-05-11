@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 import LogoIcon from './icons/LogoIcon';
 import { useAppContext } from '../context/AppContext';
 import { supabase } from '../lib/supabase';
@@ -13,6 +14,8 @@ const LoginPage: React.FC = () => {
     const [isForgotPassword, setIsForgotPassword] = useState(false);
     const [logoClicks, setLogoClicks] = useState(0);
     const [isAdminMode, setIsAdminMode] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const validateEmail = (email: string) => {
         return /\S+@\S+\.\S+/.test(email);
@@ -171,17 +174,27 @@ const LoginPage: React.FC = () => {
                             <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
                                 Password
                             </label>
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                autoComplete={isSigningUp ? "new-password" : "current-password"}
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full px-4 py-3 bg-neutral-900 border border-primary rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition duration-200"
-                                placeholder="••••••••"
-                            />
+                            <div className="relative">
+                                <input
+                                    id="password"
+                                    name="password"
+                                    type={showPassword ? "text" : "password"}
+                                    autoComplete={isSigningUp ? "new-password" : "current-password"}
+                                    required
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="w-full px-4 py-3 bg-neutral-900 border border-primary rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition duration-200 pr-10"
+                                    placeholder="••••••••"
+                                />
+                                <button
+                                    type="button"
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-200"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    aria-label={showPassword ? "Hide password" : "Show password"}
+                                >
+                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                </button>
+                            </div>
                             {isSigningUp && (
                                 <p className="mt-1 text-xs text-gray-500">Min. 6 characters</p>
                             )}
@@ -193,17 +206,27 @@ const LoginPage: React.FC = () => {
                             <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-300 mb-2">
                                 Confirm Password
                             </label>
-                            <input
-                                id="confirm-password"
-                                name="confirm-password"
-                                type="password"
-                                autoComplete="new-password"
-                                required
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                className={`w-full px-4 py-3 bg-neutral-900 border ${password && confirmPassword && password !== confirmPassword ? 'border-red-500' : 'border-primary'} rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition duration-200`}
-                                placeholder="••••••••"
-                            />
+                            <div className="relative">
+                                <input
+                                    id="confirm-password"
+                                    name="confirm-password"
+                                    type={showConfirmPassword ? "text" : "password"}
+                                    autoComplete="new-password"
+                                    required
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    className={`w-full px-4 py-3 bg-neutral-900 border ${password && confirmPassword && password !== confirmPassword ? 'border-red-500' : 'border-primary'} rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition duration-200 pr-10`}
+                                    placeholder="••••••••"
+                                />
+                                <button
+                                    type="button"
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-200"
+                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                                >
+                                    {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                </button>
+                            </div>
                             {password && confirmPassword && password !== confirmPassword && (
                                 <p className="mt-1 text-xs text-red-500">Passwords do not match</p>
                             )}
