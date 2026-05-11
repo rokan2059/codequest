@@ -16,6 +16,7 @@ export const getAchievements = async (): Promise<Achievement[]> => {
         name: a.name,
         description: a.description,
         icon: a.icon,
+        imageUrl: a.image_url,
         requiredPuzzles: a.required_puzzles
     }));
 };
@@ -23,10 +24,10 @@ export const getAchievements = async (): Promise<Achievement[]> => {
 export const checkAchievements = (user: User, allAchievements: Achievement[]): Achievement[] => {
     const earned: Achievement[] = [];
     
-    const alreadyEarned = (id: string) => user.achievements.includes(id);
+    const alreadyEarned = (id: string) => (user.achievements || []).includes(id);
 
     allAchievements.forEach(ach => {
-        if (!alreadyEarned(ach.id) && user.solvedPuzzleIds.length >= ach.requiredPuzzles) {
+        if (!alreadyEarned(ach.id) && (user.solvedPuzzleIds || []).length >= ach.requiredPuzzles) {
             earned.push(ach);
         }
     });
@@ -42,11 +43,30 @@ export const addAchievement = async (achievement: Achievement): Promise<void> =>
             name: achievement.name,
             description: achievement.description,
             icon: achievement.icon,
+            image_url: achievement.imageUrl,
             required_puzzles: achievement.requiredPuzzles
         }]);
 
     if (error) {
         console.error('Error adding achievement:', error);
+        throw error;
+    }
+};
+
+export const editAchievement = async (achievement: Achievement): Promise<void> => {
+    const { error } = await supabase
+        .from('achievements')
+        .update({
+            name: achievement.name,
+            description: achievement.description,
+            icon: achievement.icon,
+            image_url: achievement.imageUrl,
+            required_puzzles: achievement.requiredPuzzles
+        })
+        .eq('id', achievement.id);
+
+    if (error) {
+        console.error('Error updating achievement:', error);
         throw error;
     }
 };

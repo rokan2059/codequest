@@ -84,6 +84,7 @@ const AppContext = createContext<{
     resetPlayerProgress: (id: string) => void;
     completePuzzle: (puzzleId: string, points: number, xpValue: number) => void;
     addAchievement: (achievement: Achievement) => void;
+    editAchievement: (achievement: Achievement) => Promise<void>;
     deleteAchievement: (id: string) => void;
     deductPoints: (points: number, reason?: string) => Promise<boolean>;
     updateCertificateRequirements: (req: CertificateRequirements) => void;
@@ -105,6 +106,7 @@ const AppContext = createContext<{
     resetPlayerProgress: () => {},
     completePuzzle: () => {},
     addAchievement: () => {},
+    editAchievement: async () => {},
     deleteAchievement: () => {},
     deductPoints: async () => false,
     updateCertificateRequirements: () => {},
@@ -449,6 +451,17 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         }
     };
 
+    const editAchievement = async (achievement: Achievement) => {
+        try {
+            await AchievementService.editAchievement(achievement);
+            const achievements = await AchievementService.getAchievements();
+            dispatch({ type: 'INITIALIZE_DATA', payload: { ...state, achievements, puzzles: state.puzzles, players: state.players } });
+            addToast('Achievement updated successfully');
+        } catch (error: any) {
+            addToast(error.message || 'Error updating achievement', 'error');
+        }
+    };
+
     const deleteAchievement = async (id: string) => {
         try {
             await AchievementService.deleteAchievement(id);
@@ -511,6 +524,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             resetPlayerProgress,
             completePuzzle,
             addAchievement,
+            editAchievement,
             deleteAchievement,
             deductPoints,
             updateCertificateRequirements
