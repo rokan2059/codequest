@@ -19,7 +19,7 @@ const PlayerDashboard: React.FC = () => {
     const { state, dispatch } = useAppContext();
     const { user, players, puzzles } = state;
 
-    const sortedPlayers = [...players].filter(p => p.role === 'player').sort((a, b) => b.points - a.points);
+    const sortedPlayers = [...players].filter(p => p.role !== 'admin').sort((a, b) => b.points - a.points);
     const topPlayers = sortedPlayers.slice(0, 3);
     const userRank = user ? sortedPlayers.findIndex((p: User) => p.id === user.id) + 1 : 0;
     

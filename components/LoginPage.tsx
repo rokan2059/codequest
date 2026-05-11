@@ -66,15 +66,14 @@ const LoginPage: React.FC = () => {
                 await logout();
                 addToast('Access denied: Admins must use the Admin Portal.', 'error');
                 return;
-            }
-            if (result.user.role !== 'admin' && isAdminMode) {
+            } else if (result.user.role !== 'admin' && isAdminMode) {
                 // Prevent user from logging in via the admin portal
                 await logout();
                 addToast('Access denied: Invalid admin credentials.', 'error');
                 return;
+            } else {
+                addToast(result.message);
             }
-
-            addToast(result.message);
             dispatch({ type: 'LOGIN_SUCCESS', payload: result.user });
         } else {
             addToast(result.message, 'error');

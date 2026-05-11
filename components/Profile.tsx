@@ -20,7 +20,7 @@ const Profile: React.FC<ProfileProps> = ({ userId, onClose }) => {
 
     if (!displayUser) return null;
 
-    const sortedPlayers = [...players].filter(p => p.role === 'player').sort((a, b) => b.points - a.points);
+    const sortedPlayers = [...players].filter(p => p.role !== 'admin').sort((a, b) => b.points - a.points);
     const userRank = sortedPlayers.findIndex(p => p.id === displayUser.id) + 1;
     
     const userAchievements = achievements.filter(ach => displayUser.achievements.includes(ach.id));

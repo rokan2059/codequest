@@ -7,7 +7,7 @@ import * as AchievementService from '../lib/achievementService';
 import * as SettingsService from '../lib/settingsService';
 import { achievements as achievementData } from '../data/achievements';
 
-type AdminView = 'main' | 'puzzle_management' | 'category_management' | 'player_management' | 'achievement_management' | 'settings_management';
+type AdminView = 'main' | 'puzzle_management' | 'category_management' | 'player_management' | 'achievement_management' | 'settings_management' | 'leaderboard';
 type ToastMessage = { id: number; message: string; type: 'success' | 'error' };
 
 export interface CertificateRequirements {
@@ -112,15 +112,30 @@ const AppContext = createContext<{
 
 const appReducer = (state: AppState, action: Action): AppState => {
     switch (action.type) {
-        case 'INITIALIZE_DATA':
+        case 'INITIALIZE_DATA': {
+            const settingsAchievement = action.payload.achievements.find(a => a.id === '__APPLET_SETTINGS__');
+            let updatedCertReq = state.certificateRequirements;
+            if (settingsAchievement && settingsAchievement.description) {
+                try {
+                    const parsed = JSON.parse(settingsAchievement.description);
+                    if (parsed.applet_certificate_req) {
+                        updatedCertReq = parsed.applet_certificate_req;
+                    }
+                } catch (e) {
+                    console.error('Failed to parse cert req from achievement', e);
+                }
+            }
+            
             const filteredAchievements = action.payload.achievements.filter(a => a.id !== '__APPLET_SETTINGS__');
             return {
                 ...state,
                 puzzles: action.payload.puzzles,
                 players: action.payload.players,
                 achievements: filteredAchievements,
+                certificateRequirements: updatedCertReq,
                 isInitialized: true
             };
+        }
         case 'LOGIN_SUCCESS':
             // Only change view if current view is login or undefined to prevent redirect from active screens
             const shouldChangeView = state.view === 'login' || (state.user === null && state.view === 'player_dashboard');

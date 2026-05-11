@@ -16,7 +16,7 @@ const AdminLeaderboard: React.FC = () => {
     const { players } = state;
 
     const sortedPlayers = [...players]
-        .filter(p => p.role === 'player')
+        .filter(p => p.role !== 'admin')
         .sort((a, b) => b.points - a.points);
 
     return (
