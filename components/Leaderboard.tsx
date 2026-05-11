@@ -47,7 +47,6 @@ const Leaderboard: React.FC = () => {
                                     </div>
                                     <div className="text-right shrink-0 ml-4">
                                         <p className="text-lg sm:text-xl font-semibold text-blue-400">{(player.points || 0).toLocaleString()}</p>
-                                        <p className="text-xs font-medium text-gray-500">{(player.xp || 0).toLocaleString()} XP</p>
                                     </div>
                                 </li>
                             );
