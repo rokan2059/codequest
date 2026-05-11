@@ -124,8 +124,12 @@ const PlayerManagement: React.FC = () => {
                                     >
                                         <td className="p-4">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-300 font-bold border border-blue-500/30 shrink-0">
-                                                    {player.email.charAt(0).toUpperCase()}
+                                                <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-300 font-bold border border-blue-500/30 shrink-0 overflow-hidden">
+                                                    {player.avatarUrl ? (
+                                                        <img src={player.avatarUrl} alt="" className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        player.email.charAt(0).toUpperCase()
+                                                    )}
                                                 </div>
                                                 <span className="font-medium text-slate-200">{player.email}</span>
                                             </div>
