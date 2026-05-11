@@ -23,7 +23,7 @@ const Profile: React.FC<ProfileProps> = ({ userId, onClose }) => {
     const sortedPlayers = [...players].filter(p => p.role !== 'admin').sort((a, b) => b.points - a.points);
     const userRank = sortedPlayers.findIndex(p => p.id === displayUser.id) + 1;
     
-    const userAchievements = achievements.filter(ach => displayUser.achievements.includes(ach.id));
+    const userAchievementIds = displayUser.achievements || [];
     const xpProgress = displayUser.xpToNextLevel > 0 ? (displayUser.xp / displayUser.xpToNextLevel) * 100 : 0;
 
     return (
@@ -95,21 +95,40 @@ const Profile: React.FC<ProfileProps> = ({ userId, onClose }) => {
             <div>
                 <h2 className="text-2xl font-semibold text-slate-100 mb-4">Achievements</h2>
                 <div className="bg-slate-800/50 backdrop-blur-md rounded-xl border border-slate-700 p-6">
-                    {userAchievements.length > 0 ? (
+                    {achievements.length > 0 ? (
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            {userAchievements.map((ach) => (
-                                <div key={ach.id} title={`${ach.name}: ${ach.description}`} className="flex flex-col items-center text-center p-4 bg-slate-900/50 rounded-lg border border-slate-700 aspect-square justify-center">
-                                {ach.imageUrl ? (
-                                    <img src={ach.imageUrl} alt={ach.name} className="w-16 h-16 object-cover rounded-full mb-2" />
-                                ) : (
-                                    <div className="text-5xl mb-2">{ach.icon}</div>
-                                )}
-                                <h3 className="font-bold text-slate-100 text-sm">{ach.name}</h3>
-                                </div>
-                            ))}
+                            {achievements.map((ach) => {
+                                const isUnlocked = userAchievementIds.includes(ach.id);
+                                return (
+                                    <div 
+                                        key={ach.id} 
+                                        title={`${ach.name}: ${ach.description}`} 
+                                        className={`flex flex-col items-center text-center p-4 rounded-lg border transition-all duration-300 aspect-square justify-center relative group
+                                            ${isUnlocked 
+                                                ? 'bg-slate-900/50 border-slate-700 hover:border-sky-500/50' 
+                                                : 'bg-slate-900/20 border-slate-800 grayscale opacity-60'
+                                            }`}
+                                    >
+                                        {!isUnlocked && (
+                                            <div className="absolute top-2 right-2 text-slate-500">
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                            </div>
+                                        )}
+                                        {ach.imageUrl ? (
+                                            <img src={ach.imageUrl} alt={ach.name} className="w-16 h-16 object-cover rounded-full mb-2" />
+                                        ) : (
+                                            <div className="text-5xl mb-2">{ach.icon}</div>
+                                        )}
+                                        <h3 className={`font-bold text-sm ${isUnlocked ? 'text-slate-100' : 'text-slate-500'}`}>{ach.name}</h3>
+                                        <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">
+                                            {isUnlocked ? 'Unlocked' : `Requires ${ach.requiredPuzzles} Puzzles`}
+                                        </p>
+                                    </div>
+                                );
+                            })}
                         </div>
                     ) : (
-                        <p className="text-slate-400 text-center py-8">Solve more puzzles to unlock achievements!</p>
+                        <p className="text-slate-400 text-center py-8">No achievements available yet.</p>
                     )}
                 </div>
             </div>
