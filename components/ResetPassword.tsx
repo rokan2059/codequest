@@ -24,8 +24,19 @@ const ResetPassword: React.FC = () => {
         setIsLoading(true);
         try {
             await Auth.updatePassword(password);
-            addToast('Password updated successfuly! You can now log in.', 'success');
-            dispatch({ type: 'SET_VIEW', payload: 'login' });
+            addToast('Password updated successfully!', 'success');
+            // Check if they have a role to redirect correctly
+            const loggedInUser = await Auth.getLoggedInUser();
+            if (loggedInUser) {
+                dispatch({ type: 'LOGIN_SUCCESS', payload: loggedInUser });
+                if (loggedInUser.role === 'admin') {
+                    dispatch({ type: 'SET_VIEW', payload: 'admin_dashboard' });
+                } else {
+                    dispatch({ type: 'SET_VIEW', payload: 'player_dashboard' });
+                }
+            } else {
+                dispatch({ type: 'SET_VIEW', payload: 'login' });
+            }
         } catch (error: any) {
             addToast(error.message || 'Error updating password', 'error');
         } finally {

@@ -93,6 +93,9 @@ export const signup = async (email: string, password: string): Promise<{ success
     const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+            emailRedirectTo: 'https://codequest-dodv.onrender.com/'
+        }
     });
 
     if (error) {
