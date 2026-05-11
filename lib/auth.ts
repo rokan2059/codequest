@@ -104,7 +104,7 @@ export const signup = async (email: string, password: string): Promise<{ success
 
 export const resetPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.origin,
+        redirectTo: 'https://codequest-dodv.onrender.com/',
     });
     if (error) throw error;
     return { success: true, message: 'Password reset link sent to your email.' };
