@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import TrophyIcon from './icons/TrophyIcon';
 import PuzzleIcon from './icons/PuzzleIcon';
 import ChartBarIcon from './icons/ChartBarIcon';
 import { useAppContext } from '../context/AppContext';
 import CertificateModal from './CertificateModal';
+import { uploadFile } from '../lib/storageService';
+import * as Auth from '../lib/auth';
 
 interface ProfileProps {
     userId?: string;
@@ -17,6 +19,8 @@ const Profile: React.FC<ProfileProps> = ({ userId, onClose }) => {
     
     const displayUser = userId ? players.find(p => p.id === userId) : state.user;
     const [showCertificate, setShowCertificate] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+    const avatarInputRef = useRef<HTMLInputElement>(null);
 
     if (!displayUser) return null;
 
@@ -25,6 +29,30 @@ const Profile: React.FC<ProfileProps> = ({ userId, onClose }) => {
     
     const userAchievementIds = displayUser.achievements || [];
     const xpProgress = displayUser.xpToNextLevel > 0 ? (displayUser.xp / displayUser.xpToNextLevel) * 100 : 0;
+
+    const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !state.user) return;
+
+        try {
+            setIsUploading(true);
+            const bucket = 'avatars'; // Use avatars bucket
+            const path = `avatar_${state.user.id}_${Date.now()}`;
+            const url = await uploadFile(bucket, path, file);
+            
+            const updatedUser = { ...state.user, avatarUrl: url };
+            await Auth.updateUser(updatedUser);
+            dispatch({ type: 'LOGIN_SUCCESS', payload: updatedUser });
+            addToast('Profile picture updated!');
+        } catch (error: any) {
+            console.error('Avatar upload failed:', error);
+            addToast('Upload failed: ' + (error.message || 'Unknown error'), 'error');
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
+    const isOwnProfile = !userId || (state.user && state.user.id === userId);
 
     return (
         <div className="container mx-auto max-w-4xl relative">
@@ -38,8 +66,40 @@ const Profile: React.FC<ProfileProps> = ({ userId, onClose }) => {
                 </button>
             )}
             <div className="text-center mb-10 pt-4">
-                <div className="w-24 h-24 rounded-full bg-sky-500/20 mx-auto flex items-center justify-center border-2 border-sky-400 mb-4">
-                     <span className="text-4xl font-bold text-slate-100">{displayUser.email.charAt(0).toUpperCase()}</span>
+                <div className="relative inline-block group">
+                    <div className="w-24 h-24 rounded-full bg-sky-500/20 mx-auto flex items-center justify-center border-2 border-sky-400 mb-4 overflow-hidden">
+                        {displayUser.avatarUrl ? (
+                            <img src={displayUser.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                        ) : (
+                            <span className="text-4xl font-bold text-slate-100">{displayUser.email.charAt(0).toUpperCase()}</span>
+                        )}
+                        {isUploading && (
+                            <div className="absolute inset-0 bg-slate-900/60 flex items-center justify-center">
+                                <svg className="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </div>
+                        )}
+                    </div>
+                    {isOwnProfile && !isUploading && (
+                        <>
+                            <input 
+                                type="file" 
+                                ref={avatarInputRef}
+                                onChange={handleAvatarUpload}
+                                className="hidden"
+                                accept="image/*"
+                            />
+                            <button 
+                                onClick={() => avatarInputRef.current?.click()}
+                                className="absolute bottom-4 right-0 p-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-full shadow-lg border border-slate-900 transition-all opacity-0 group-hover:opacity-100"
+                                title="Change Profile Picture"
+                            >
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            </button>
+                        </>
+                    )}
                 </div>
                 <h1 className="text-4xl font-bold text-slate-100">{displayUser.email}</h1>
                 <p className="text-lg text-slate-400">Level {displayUser.level} {displayUser.role === 'admin' ? '(Admin)' : ''}</p>

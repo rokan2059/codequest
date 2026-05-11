@@ -32,10 +32,17 @@ const Leaderboard: React.FC = () => {
                             return (
                                 <li key={player.id} className={`flex items-center justify-between p-4 ${isCurrentUser ? 'bg-blue-900/50' : ''} ${index === 0 ? 'rounded-t-xl' : ''} ${index === sortedPlayers.length - 1 ? 'rounded-b-xl' : ''}`}>
                                     <div className="flex items-center gap-4 flex-1 min-w-0">
-                                        <div className="flex items-center justify-center shrink-0 w-12">
+                                        <div className="flex items-center justify-center shrink-0 w-12 text-center">
                                             <span className={`text-xl sm:text-2xl font-bold ${getRankColor(rank)}`}>
                                                 {rank}
                                             </span>
+                                        </div>
+                                        <div className="w-10 h-10 rounded-full bg-slate-700 shrink-0 overflow-hidden flex items-center justify-center border border-slate-600">
+                                            {player.avatarUrl ? (
+                                                <img src={player.avatarUrl} alt="" className="w-full h-full object-cover" />
+                                            ) : (
+                                                <span className="text-xs font-bold text-slate-300">{player.email.charAt(0).toUpperCase()}</span>
+                                            )}
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <p className="text-base sm:text-lg font-medium text-gray-100 truncate flex items-center gap-2">

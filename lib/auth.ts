@@ -47,6 +47,7 @@ export const getPlayers = async (): Promise<User[]> => {
         xpToNextLevel: calculateLevel(calculateTotalXp(profile.level, profile.xp)).xpToNextLevel,
         solvedPuzzleIds: profile.solved_puzzle_ids || [],
         achievements: profile.achievement_ids || [],
+        avatarUrl: profile.avatar_url,
         created_at: profile.created_at
     }));
 };
@@ -83,6 +84,7 @@ export const login = async (email: string, password: string): Promise<{ success:
         xpToNextLevel: levelInfo.xpToNextLevel,
         solvedPuzzleIds: profileNode.solved_puzzle_ids || [],
         achievements: profileNode.achievement_ids || [],
+        avatarUrl: profileNode.avatar_url,
         created_at: profileNode.created_at
     };
 
@@ -149,6 +151,7 @@ export const getLoggedInUser = async (): Promise<User | null> => {
         xpToNextLevel: levelInfo.xpToNextLevel,
         solvedPuzzleIds: profile.solved_puzzle_ids || [],
         achievements: profile.achievement_ids || [],
+        avatarUrl: profile.avatar_url,
         created_at: profile.created_at,
         certificate_id: profile.certificate_id,
         certificate_name: profile.certificate_name,
@@ -167,6 +170,7 @@ export const updateUser = async (updatedUser: User) => {
             level: levelInfo.level,
             solved_puzzle_ids: updatedUser.solvedPuzzleIds,
             achievement_ids: updatedUser.achievements,
+            avatar_url: updatedUser.avatarUrl,
             certificate_id: updatedUser.certificate_id,
             certificate_name: updatedUser.certificate_name,
             certificate_issued_at: updatedUser.certificate_issued_at,

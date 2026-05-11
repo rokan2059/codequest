@@ -34,6 +34,7 @@ export interface User {
     xpToNextLevel: number;
     solvedPuzzleIds: string[];
     achievements: string[]; // Array of achievement IDs
+    avatarUrl?: string;
     created_at?: string;
     certificate_id?: string;
     certificate_name?: string;
