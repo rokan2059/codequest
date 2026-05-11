@@ -62,17 +62,31 @@ export const login = async (email: string, password: string): Promise<{ success:
         return { success: false, message: authError.message };
     }
 
-    const { data: profileNode, error: profileError } = await supabase
+    let { data: profileNode, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', authData.user.id)
         .single();
 
-    if (profileError) {
-        return { success: false, message: 'Profile not found.' };
+    if (profileError || !profileNode) {
+        console.warn('Profile missing on login, creating fallback...');
+        const { data: newProfile, error: insertError } = await supabase
+            .from('profiles')
+            .insert([{ 
+                id: authData.user.id, 
+                email: authData.user.email,
+                role: 'player'
+            }])
+            .select()
+            .single();
+        
+        if (insertError) {
+            return { success: false, message: 'Profile not found and could not be created.' };
+        }
+        profileNode = newProfile;
     }
 
-    const levelInfo = calculateLevel(calculateTotalXp(profileNode.level, profileNode.xp));
+    const levelInfo = calculateLevel(calculateTotalXp(profileNode.level || 1, profileNode.xp || 0));
 
     const user: User = {
         id: profileNode.id,
@@ -131,23 +145,41 @@ export const getLoggedInUser = async (): Promise<User | null> => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return null;
 
-    const { data: profile, error } = await supabase
+    let { data: profile, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', session.user.id)
         .single();
 
-    if (error || !profile) return null;
+    if (error || !profile) {
+        console.warn('Profile missing for user, attempting to create one...', session.user.id);
+        // Fallback: If profile doesn't exist, try to create it (logic from trigger)
+        const { data: newProfile, error: insertError } = await supabase
+            .from('profiles')
+            .insert([{ 
+                id: session.user.id, 
+                email: session.user.email,
+                role: 'player'
+            }])
+            .select()
+            .single();
+        
+        if (insertError) {
+            console.error('Failed to create fallback profile:', insertError);
+            return null;
+        }
+        profile = newProfile;
+    }
 
-    const levelInfo = calculateLevel(calculateTotalXp(profile.level, profile.xp));
+    const levelInfo = calculateLevel(calculateTotalXp(profile.level || 1, profile.xp || 0));
 
     return {
         id: profile.id,
         email: profile.email,
         role: profile.role,
-        points: profile.points,
-        xp: profile.xp,
-        level: profile.level,
+        points: profile.points || 0,
+        xp: profile.xp || 0,
+        level: profile.level || 1,
         xpToNextLevel: levelInfo.xpToNextLevel,
         solvedPuzzleIds: profile.solved_puzzle_ids || [],
         achievements: profile.achievement_ids || [],

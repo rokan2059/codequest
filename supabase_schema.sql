@@ -28,6 +28,9 @@ ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS certificate_issued_at TIMES
 -- Cleanup legacy table if it exists
 DROP TABLE IF EXISTS public.solved_puzzles CASCADE;
 
+-- Ensure avatar_url exists in profiles
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT;
+
 -- 2A. CATEGORIES TABLE
 DROP TABLE IF EXISTS public.categories CASCADE;
 CREATE TABLE public.categories (
@@ -62,6 +65,7 @@ CREATE TABLE public.achievements (
   description TEXT NOT NULL,
   icon TEXT NOT NULL,
   required_puzzles INTEGER NOT NULL,
+  image_url TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 

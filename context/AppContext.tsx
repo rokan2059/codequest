@@ -233,35 +233,33 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         const initData = async () => {
             try {
                 console.log('Initializing data...');
-                const dbSettings = await SettingsService.loadSettings();
-                if (dbSettings) {
-                    dispatch({ type: 'SET_CERTIFICATE_REQUIREMENTS', payload: dbSettings });
-                } else {
-                    const storedReq = localStorage.getItem('applet_certificate_req');
-                    if (storedReq) {
-                        try {
-                            const parsedReq = JSON.parse(storedReq);
-                            dispatch({ type: 'SET_CERTIFICATE_REQUIREMENTS', payload: parsedReq });
-                            await SettingsService.saveSettings(parsedReq);
-                        } catch (e) {
-                            console.error('Failed to parse certificate requirements:', e);
-                        }
+                
+                // Load settings safely
+                try {
+                    const dbSettings = await SettingsService.loadSettings();
+                    if (dbSettings) {
+                        dispatch({ type: 'SET_CERTIFICATE_REQUIREMENTS', payload: dbSettings });
                     }
+                } catch (e) {
+                    console.error('Failed to load settings from DB:', e);
                 }
 
-                const puzzles = await PuzzleService.getPuzzles();
-                const players = await Auth.getPlayers();
-                const achievements = await AchievementService.getAchievements();
-                dispatch({ type: 'INITIALIZE_DATA', payload: { puzzles, players, achievements } });
+                // Load main data with individual error handling
+                const [puzzles, players, achievements] = await Promise.all([
+                    PuzzleService.getPuzzles().catch(e => { console.error('Puzzles load failed:', e); return {}; }),
+                    Auth.getPlayers().catch(e => { console.error('Players load failed:', e); return []; }),
+                    AchievementService.getAchievements().catch(e => { console.error('Achievements load failed:', e); return []; })
+                ]);
+
+                dispatch({ type: 'INITIALIZE_DATA', payload: { puzzles, players: players as User[], achievements: achievements as Achievement[] } });
 
                 const loggedInUser = await Auth.getLoggedInUser();
                 if (loggedInUser) {
                     dispatch({ type: 'LOGIN_SUCCESS', payload: loggedInUser });
                 }
-                console.log('Data initialized successfully');
+                console.log('Data initialization attempt finished');
             } catch (error) {
-                console.error('Failed to initialize data:', error);
-                addToast('Failed to load data. Please refresh or check your connection.', 'error');
+                console.error('Critical failure in initialize data:', error);
             }
         };
 
