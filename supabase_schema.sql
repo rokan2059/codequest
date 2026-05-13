@@ -28,8 +28,10 @@ ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS certificate_issued_at TIMES
 -- Cleanup legacy table if it exists
 DROP TABLE IF EXISTS public.solved_puzzles CASCADE;
 
--- Ensure avatar_url exists in profiles
+-- Ensure columns exist in profiles
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS username TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS username_changes INTEGER DEFAULT 0;
 
 -- 2A. CATEGORIES TABLE
 DROP TABLE IF EXISTS public.categories CASCADE;

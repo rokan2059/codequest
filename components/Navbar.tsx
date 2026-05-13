@@ -8,6 +8,7 @@ import { Menu, X } from 'lucide-react';
 
 interface NavbarProps {
     userEmail?: string;
+    userName?: string;
     onLogout?: () => void;
     setView: (view: View) => void;
     selectCategory: (category: string | null) => void;
@@ -31,9 +32,10 @@ const NavLink: React.FC<{
     </button>
 );
 
-const Navbar: React.FC<NavbarProps> = ({ userEmail, onLogout, setView, selectCategory, activeView }) => {
+const Navbar: React.FC<NavbarProps> = ({ userEmail, userName, onLogout, setView, selectCategory, activeView }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     
+    const displayName = userName || (userEmail ? 'Challenger' : undefined);
     const handlePuzzlesClick = () => {
         selectCategory(null); // Reset category selection to show the main hub
         setView('puzzles');
@@ -63,9 +65,9 @@ const Navbar: React.FC<NavbarProps> = ({ userEmail, onLogout, setView, selectCat
                         </div>
                     </div>
                     <div className="hidden md:flex items-center">
-                         {userEmail ? (
+                         {displayName ? (
                              <>
-                                 <span className="text-gray-400 text-sm mr-4">{userEmail}</span>
+                                 <span className="text-gray-400 text-sm mr-4">{displayName}</span>
                                  <button
                                      onClick={onLogout}
                                      title="Log Out"
@@ -110,9 +112,9 @@ const Navbar: React.FC<NavbarProps> = ({ userEmail, onLogout, setView, selectCat
                         {userEmail && <NavLink label="Profile" isActive={activeView === 'profile'} onClick={() => handleViewChange('profile')} />}
                     </div>
                     <div className="pt-4 pb-3 border-t border-gray-700">
-                        {userEmail ? (
+                        {displayName ? (
                             <div className="flex items-center px-5 flex-col gap-4">
-                                <div className="text-base font-medium text-white">{userEmail}</div>
+                                <div className="text-base font-medium text-white">{displayName}</div>
                                 <button
                                     onClick={() => {
                                         if (onLogout) onLogout();

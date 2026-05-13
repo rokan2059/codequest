@@ -41,7 +41,7 @@ const PlayerDashboard: React.FC = () => {
     return (
         <div className="container mx-auto fade-in">
             <div className="text-left mb-12">
-                <h1 className="text-4xl font-bold text-gray-100">Welcome, Challenger!</h1>
+                <h1 className="text-4xl font-bold text-gray-100">Welcome, {user?.username || 'Challenger'}!</h1>
                 <p className="text-lg text-gray-400 mt-2">Here's a look at the current state of play. Dive in!</p>
             </div>
 
@@ -90,7 +90,7 @@ const PlayerDashboard: React.FC = () => {
                                 <li key={player.id} className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         <TrophyIcon className={`w-6 h-6 ${getRankColor(index + 1)}`} />
-                                        <span className="font-medium text-gray-200">{player.email.split('@')[0]}</span>
+                                        <span className="font-medium text-gray-200">{player.username || 'Anonymous Player'}</span>
                                     </div>
                                     <span className="font-bold text-primary">{player.points}</span>
                                 </li>

@@ -52,7 +52,7 @@ const AdminLeaderboard: React.FC = () => {
                                             </div>
                                         </td>
                                         <td className="p-4 font-medium text-slate-200">
-                                            {player.email}
+                                            {player.username || 'Anonymous Player'}
                                         </td>
                                          <td className="p-4 text-center text-slate-400">
                                             {player.level}

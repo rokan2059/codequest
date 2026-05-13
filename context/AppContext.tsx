@@ -70,7 +70,7 @@ const AppContext = createContext<{
     state: AppState;
     dispatch: React.Dispatch<Action>;
     login: typeof Auth.login;
-    signup: (email: string, password: string, adminSecret?: string) => Promise<{ success: boolean; message: string }>;
+    signup: (email: string, password: string, username: string) => Promise<{ success: boolean; message: string }>;
     logout: () => void;
     selectCategory: (category: string | null) => void;
     addToast: (message: string, type?: 'success' | 'error') => void;

@@ -47,6 +47,8 @@ export const getPlayers = async (): Promise<User[]> => {
         xpToNextLevel: calculateLevel(calculateTotalXp(profile.level, profile.xp)).xpToNextLevel,
         solvedPuzzleIds: profile.solved_puzzle_ids || [],
         achievements: profile.achievement_ids || [],
+        username: profile.username,
+        username_changes: profile.username_changes || 0,
         avatarUrl: profile.avatar_url,
         created_at: profile.created_at
     }));
@@ -75,6 +77,7 @@ export const login = async (email: string, password: string): Promise<{ success:
             .insert([{ 
                 id: authData.user.id, 
                 email: authData.user.email,
+                username: authData.user.user_metadata?.username,
                 role: 'player'
             }])
             .select()
@@ -98,6 +101,8 @@ export const login = async (email: string, password: string): Promise<{ success:
         xpToNextLevel: levelInfo.xpToNextLevel,
         solvedPuzzleIds: profileNode.solved_puzzle_ids || [],
         achievements: profileNode.achievement_ids || [],
+        username: profileNode.username,
+        username_changes: profileNode.username_changes || 0,
         avatarUrl: profileNode.avatar_url,
         created_at: profileNode.created_at
     };
@@ -105,12 +110,15 @@ export const login = async (email: string, password: string): Promise<{ success:
     return { success: true, message: 'Login successful!', user };
 };
 
-export const signup = async (email: string, password: string): Promise<{ success: boolean; message: string }> => {
+export const signup = async (email: string, password: string, username: string): Promise<{ success: boolean; message: string }> => {
     const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-            emailRedirectTo: 'https://codequest-dodv.onrender.com/'
+            emailRedirectTo: 'https://codequest-dodv.onrender.com/',
+            data: {
+                username: username
+            }
         }
     });
 
@@ -159,6 +167,7 @@ export const getLoggedInUser = async (): Promise<User | null> => {
             .insert([{ 
                 id: session.user.id, 
                 email: session.user.email,
+                username: session.user.user_metadata?.username,
                 role: 'player'
             }])
             .select()
@@ -183,6 +192,8 @@ export const getLoggedInUser = async (): Promise<User | null> => {
         xpToNextLevel: levelInfo.xpToNextLevel,
         solvedPuzzleIds: profile.solved_puzzle_ids || [],
         achievements: profile.achievement_ids || [],
+        username: profile.username,
+        username_changes: profile.username_changes || 0,
         avatarUrl: profile.avatar_url,
         created_at: profile.created_at,
         certificate_id: profile.certificate_id,
@@ -194,20 +205,39 @@ export const getLoggedInUser = async (): Promise<User | null> => {
 export const updateUser = async (updatedUser: User) => {
     const levelInfo = calculateLevel(calculateTotalXp(updatedUser.level, updatedUser.xp));
     
+    // Fetch current state to verify username changes
+    const { data: currentProfile } = await supabase
+        .from('profiles')
+        .select('username, username_changes')
+        .eq('id', updatedUser.id)
+        .single();
+
+    const updateData: any = {
+        points: updatedUser.points,
+        xp: updatedUser.xp,
+        level: levelInfo.level,
+        solved_puzzle_ids: updatedUser.solvedPuzzleIds,
+        achievement_ids: updatedUser.achievements,
+        avatar_url: updatedUser.avatarUrl,
+        certificate_id: updatedUser.certificate_id,
+        certificate_name: updatedUser.certificate_name,
+        certificate_issued_at: updatedUser.certificate_issued_at,
+        updated_at: new Date().toISOString()
+    };
+
+    // Strict check: Only allow username update if it's changing and hasn't been changed before
+    if (updatedUser.username && updatedUser.username !== currentProfile?.username) {
+        if ((currentProfile?.username_changes || 0) < 1) {
+            updateData.username = updatedUser.username;
+            updateData.username_changes = (currentProfile?.username_changes || 0) + 1;
+        } else {
+            console.warn('User attempted to change username multiple times.');
+        }
+    }
+
     const { error } = await supabase
         .from('profiles')
-        .update({
-            points: updatedUser.points,
-            xp: updatedUser.xp,
-            level: levelInfo.level,
-            solved_puzzle_ids: updatedUser.solvedPuzzleIds,
-            achievement_ids: updatedUser.achievements,
-            avatar_url: updatedUser.avatarUrl,
-            certificate_id: updatedUser.certificate_id,
-            certificate_name: updatedUser.certificate_name,
-            certificate_issued_at: updatedUser.certificate_issued_at,
-            updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', updatedUser.id);
 
     if (error) {

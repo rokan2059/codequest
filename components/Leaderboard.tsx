@@ -41,12 +41,12 @@ const Leaderboard: React.FC = () => {
                                             {player.avatarUrl ? (
                                                 <img src={player.avatarUrl} alt="" className="w-full h-full object-cover" />
                                             ) : (
-                                                <span className="text-xs font-bold text-slate-300">{player.email.charAt(0).toUpperCase()}</span>
+                                                <span className="text-xs font-bold text-slate-300">{(player.username || 'P').charAt(0).toUpperCase()}</span>
                                             )}
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <p className="text-base sm:text-lg font-medium text-gray-100 truncate flex items-center gap-2">
-                                                {player.email}
+                                                {player.username || 'Anonymous Player'}
                                                 {rank <= 3 && <TrophyIcon className={`w-5 h-5 hidden sm:block ${getRankColor(rank)}`} />}
                                                 {isCurrentUser && <span className="text-xs text-blue-400 shrink-0">(You)</span>}
                                             </p>

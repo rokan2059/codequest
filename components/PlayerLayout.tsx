@@ -49,6 +49,7 @@ const PlayerLayout: React.FC = () => {
         <div className="flex flex-col min-h-screen bg-background text-white">
             <Navbar 
                 userEmail={user?.email} 
+                userName={user?.username}
                 onLogout={user ? logout : undefined} 
                 setView={setView} 
                 selectCategory={selectCategory}

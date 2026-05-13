@@ -43,7 +43,7 @@ const AdminDashboard: React.FC = () => {
             <header className="flex justify-between items-center mb-8">
                 <div>
                     <h1 className="text-3xl font-bold text-slate-100">Admin Dashboard</h1>
-                    <p className="text-slate-400">Logged in as: {user.email}</p>
+                    <p className="text-slate-400">Logged in as: {user.username || 'Admin'}</p>
                 </div>
                 <motion.button
                     whileHover={{ scale: 1.05 }}

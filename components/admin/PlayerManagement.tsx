@@ -16,7 +16,8 @@ const PlayerManagement: React.FC = () => {
     const filteredPlayers = useMemo(() => {
         return players.filter(player =>
             player.role === 'player' &&
-            player.email.toLowerCase().includes(searchTerm.toLowerCase())
+            (player.email.toLowerCase().includes(searchTerm.toLowerCase()) || 
+             (player.username?.toLowerCase() || '').includes(searchTerm.toLowerCase()))
         );
     }, [players, searchTerm]);
 
@@ -96,7 +97,7 @@ const PlayerManagement: React.FC = () => {
             <div className="mb-6">
                 <input
                     type="text"
-                    placeholder="Search player by email..."
+                    placeholder="Search player by username or email..."
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
                     className="w-full md:w-1/3 px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md"
@@ -128,10 +129,12 @@ const PlayerManagement: React.FC = () => {
                                                     {player.avatarUrl ? (
                                                         <img src={player.avatarUrl} alt="" className="w-full h-full object-cover" />
                                                     ) : (
-                                                        player.email.charAt(0).toUpperCase()
+                                                        (player.username || player.email).charAt(0).toUpperCase()
                                                     )}
                                                 </div>
-                                                <span className="font-medium text-slate-200">{player.email}</span>
+                                                <div className="flex flex-col">
+                                                    <span className="font-medium text-slate-200">{player.username || 'Anonymous Player'}</span>
+                                                </div>
                                             </div>
                                         </td>
                                         <td className="p-4 text-center text-slate-400 text-sm font-mono">

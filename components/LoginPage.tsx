@@ -7,6 +7,7 @@ import { supabase } from '../lib/supabase';
 const LoginPage: React.FC = () => {
     const { login, signup, logout, addToast, dispatch } = useAppContext();
     const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -82,8 +83,12 @@ const LoginPage: React.FC = () => {
     
     const handleSignUpSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        if (!email || !password || !confirmPassword) {
+        if (!email || !password || !confirmPassword || !username) {
             addToast('Please fill in all fields.', 'error');
+            return;
+        }
+        if (username.length < 3) {
+            addToast('Username must be at least 3 characters long.', 'error');
             return;
         }
         if (!validateEmail(email)) {
@@ -100,13 +105,14 @@ const LoginPage: React.FC = () => {
         }
 
         setIsLoading(true);
-        const result = await signup(email, password);
+        const result = await signup(email, password, username);
         setIsLoading(false);
 
         if (result.success) {
             addToast(result.message);
             setIsSigningUp(false);
             setEmail('');
+            setUsername('');
             setPassword('');
             setConfirmPassword('');
         } else {
@@ -119,6 +125,7 @@ const LoginPage: React.FC = () => {
         setIsSigningUp(!isSigningUp);
         // Reset form fields
         setEmail('');
+        setUsername('');
         setPassword('');
         setConfirmPassword('');
     };
@@ -167,6 +174,24 @@ const LoginPage: React.FC = () => {
                             placeholder="you@example.com"
                         />
                     </div>
+
+                    {isSigningUp && (
+                        <div>
+                            <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-2">
+                                Username (Publicly Visible)
+                            </label>
+                            <input
+                                id="username"
+                                name="username"
+                                type="text"
+                                required
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                className="w-full px-4 py-3 bg-neutral-900 border border-primary rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition duration-200"
+                                placeholder="code_warrior"
+                            />
+                        </div>
+                    )}
 
                     {!isForgotPassword && (
                         <div>
