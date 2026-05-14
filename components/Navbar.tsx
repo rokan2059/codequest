@@ -51,17 +51,18 @@ const Navbar: React.FC<NavbarProps> = ({ userEmail, userName, onLogout, setView,
         <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-primary">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
-                    <div className="flex items-center">
+                    <div className="flex items-center gap-2 cursor-pointer" onClick={() => { setView('player_dashboard'); selectCategory(null); }}>
                         <div className="flex-shrink-0">
                             <LogoIcon />
                         </div>
-                        <div className="hidden md:block">
-                            <div className="ml-10 flex items-baseline space-x-4">
-                                <NavLink label="Dashboard" isActive={activeView === 'player_dashboard'} onClick={() => handleViewChange('player_dashboard')} />
-                                <NavLink label="Puzzles" isActive={activeView === 'puzzles' || activeView === 'puzzle_view'} onClick={handlePuzzlesClick} />
-                                <NavLink label="Leaderboard" isActive={activeView === 'leaderboard'} onClick={() => handleViewChange('leaderboard')} />
-                                {userEmail && <NavLink label="Profile" isActive={activeView === 'profile'} onClick={() => handleViewChange('profile')} />}
-                            </div>
+                        <span className="hidden sm:block text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-indigo-500">Arena</span>
+                    </div>
+                    <div className="hidden md:block">
+                        <div className="ml-10 flex items-baseline space-x-4">
+                            <NavLink label="Dashboard" isActive={activeView === 'player_dashboard'} onClick={() => handleViewChange('player_dashboard')} />
+                            <NavLink label="Puzzles" isActive={activeView === 'puzzles' || activeView === 'puzzle_view'} onClick={handlePuzzlesClick} />
+                            <NavLink label="Leaderboard" isActive={activeView === 'leaderboard'} onClick={() => handleViewChange('leaderboard')} />
+                            {userEmail && <NavLink label="Profile" isActive={activeView === 'profile'} onClick={() => handleViewChange('profile')} />}
                         </div>
                     </div>
                     <div className="hidden md:flex items-center">
