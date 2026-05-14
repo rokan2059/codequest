@@ -87,6 +87,17 @@ export const login = async (email: string, password: string): Promise<{ success:
             return { success: false, message: 'Profile not found and could not be created.' };
         }
         profileNode = newProfile;
+    } else if (!profileNode.username && authData.user.user_metadata?.username) {
+        // Sync username if missing in profile but present in metadata
+        const { data: updatedProfile } = await supabase
+            .from('profiles')
+            .update({ username: authData.user.user_metadata.username })
+            .eq('id', authData.user.id)
+            .select()
+            .single();
+        if (updatedProfile) {
+            profileNode = updatedProfile;
+        }
     }
 
     const levelInfo = calculateLevel(calculateTotalXp(profileNode.level || 1, profileNode.xp || 0));
@@ -111,11 +122,12 @@ export const login = async (email: string, password: string): Promise<{ success:
 };
 
 export const signup = async (email: string, password: string, username: string): Promise<{ success: boolean; message: string }> => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://codequest.arena';
     const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-            emailRedirectTo: 'https://codequest-dodv.onrender.com/',
+            emailRedirectTo: `${origin}/`,
             data: {
                 username: username
             }
@@ -130,8 +142,9 @@ export const signup = async (email: string, password: string, username: string):
 };
 
 export const resetPassword = async (email: string) => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://codequest.arena';
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://codequest-dodv.onrender.com/',
+        redirectTo: `${origin}/`,
     });
     if (error) throw error;
     return { success: true, message: 'Password reset link sent to your email.' };
@@ -178,6 +191,17 @@ export const getLoggedInUser = async (): Promise<User | null> => {
             return null;
         }
         profile = newProfile;
+    } else if (!profile.username && session.user.user_metadata?.username) {
+        // Sync username if missing in profile but present in metadata
+        const { data: updatedProfile } = await supabase
+            .from('profiles')
+            .update({ username: session.user.user_metadata.username })
+            .eq('id', session.user.id)
+            .select()
+            .single();
+        if (updatedProfile) {
+            profile = updatedProfile;
+        }
     }
 
     const levelInfo = calculateLevel(calculateTotalXp(profile.level || 1, profile.xp || 0));
@@ -205,13 +229,6 @@ export const getLoggedInUser = async (): Promise<User | null> => {
 export const updateUser = async (updatedUser: User) => {
     const levelInfo = calculateLevel(calculateTotalXp(updatedUser.level, updatedUser.xp));
     
-    // Fetch current state to verify username changes
-    const { data: currentProfile } = await supabase
-        .from('profiles')
-        .select('username, username_changes')
-        .eq('id', updatedUser.id)
-        .single();
-
     const updateData: any = {
         points: updatedUser.points,
         xp: updatedUser.xp,
@@ -224,16 +241,6 @@ export const updateUser = async (updatedUser: User) => {
         certificate_issued_at: updatedUser.certificate_issued_at,
         updated_at: new Date().toISOString()
     };
-
-    // Strict check: Only allow username update if it's changing and hasn't been changed before
-    if (updatedUser.username && updatedUser.username !== currentProfile?.username) {
-        if ((currentProfile?.username_changes || 0) < 1) {
-            updateData.username = updatedUser.username;
-            updateData.username_changes = (currentProfile?.username_changes || 0) + 1;
-        } else {
-            console.warn('User attempted to change username multiple times.');
-        }
-    }
 
     const { error } = await supabase
         .from('profiles')

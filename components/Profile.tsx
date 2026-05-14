@@ -20,8 +20,6 @@ const Profile: React.FC<ProfileProps> = ({ userId, onClose }) => {
     const displayUser = userId ? players.find(p => p.id === userId) : state.user;
     const [showCertificate, setShowCertificate] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
-    const [isEditingUsername, setIsEditingUsername] = useState(false);
-    const [newUsername, setNewUsername] = useState(displayUser?.username || '');
     const avatarInputRef = useRef<HTMLInputElement>(null);
 
     if (!displayUser) return null;
@@ -104,56 +102,9 @@ const Profile: React.FC<ProfileProps> = ({ userId, onClose }) => {
                     )}
                 </div>
                 <div className="flex flex-col items-center gap-2">
-                    {isEditingUsername ? (
-                        <div className="flex items-center gap-2">
-                            <input 
-                                type="text" 
-                                value={newUsername} 
-                                onChange={(e) => setNewUsername(e.target.value)}
-                                className="bg-slate-800 border border-sky-500 text-slate-100 px-3 py-1 rounded-lg text-2xl font-bold text-center focus:outline-none"
-                                autoFocus
-                            />
-                            <button 
-                                onClick={async () => {
-                                    if (!state.user || !newUsername) return;
-                                    const updatedUser = { 
-                                        ...state.user, 
-                                        username: newUsername,
-                                        username_changes: (state.user.username_changes || 0) + 1 
-                                    };
-                                    await Auth.updateUser(updatedUser);
-                                    dispatch({ type: 'LOGIN_SUCCESS', payload: updatedUser });
-                                    setIsEditingUsername(false);
-                                    addToast('Username updated!');
-                                }}
-                                className="p-2 bg-green-600 hover:bg-green-500 text-white rounded-lg transition-colors"
-                            >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
-                            </button>
-                            <button 
-                                onClick={() => {
-                                    setIsEditingUsername(false);
-                                    setNewUsername(displayUser.username || '');
-                                }}
-                                className="p-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
-                            >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                            </button>
-                        </div>
-                    ) : (
-                        <h1 className="text-4xl font-bold text-slate-100 flex items-center gap-2">
-                            {displayUser.username || 'Challenger'}
-                            {isOwnProfile && (displayUser.username_changes || 0) < 1 && (
-                                <button 
-                                    onClick={() => setIsEditingUsername(true)}
-                                    className="p-1.5 text-slate-500 hover:text-sky-400 transition-colors"
-                                    title="Edit Username (One-time only)"
-                                >
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                </button>
-                            )}
-                        </h1>
-                    )}
+                    <h1 className="text-4xl font-bold text-slate-100 flex items-center gap-2">
+                        {displayUser.username || 'Challenger'}
+                    </h1>
                 </div>
                 <p className="text-lg text-slate-400 mt-2">Level {displayUser.level} {displayUser.role === 'admin' ? '(Admin)' : ''}</p>
                 <div className="mt-6">
