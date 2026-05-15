@@ -204,7 +204,18 @@ const appReducer = (state: AppState, action: Action): AppState => {
         case 'RESET_PLAYER_PROGRESS':
             return {
                 ...state,
-                players: state.players.map(p => p.id === action.payload ? { ...p, points: 0, xp: 0, level: 1, xpToNextLevel: 150, solvedPuzzleIds: [], achievements: [] } : p)
+                players: state.players.map(p => p.id === action.payload ? { 
+                    ...p, 
+                    points: 0, 
+                    xp: 0, 
+                    level: 1, 
+                    xpToNextLevel: 150, 
+                    solvedPuzzleIds: [], 
+                    achievements: [],
+                    certificate_id: undefined,
+                    certificate_name: undefined,
+                    certificate_issued_at: undefined
+                } : p)
             };
         case 'ADD_TOAST':
             return {
@@ -424,10 +435,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             await Auth.updateUser(finalUpdatedUser);
             // Update local state immediately for responsiveness
             dispatch({ type: 'LOGIN_SUCCESS', payload: finalUpdatedUser });
-            
-            // Optionally refresh players list for leaderboard
-            const players = await Auth.getPlayers();
-            dispatch({ type: 'INITIALIZE_DATA', payload: { puzzles: state.puzzles, players, achievements: state.achievements } });
             
             if (newLevel > state.user.level) {
                 addToast(`Level Up! You are now level ${newLevel}! 🎊`, 'success');

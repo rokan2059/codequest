@@ -2,8 +2,6 @@ import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import { User } from '../../lib/types';
 import UserCircleIcon from '../icons/UserCircleIcon';
-import TrophyIcon from '../icons/TrophyIcon';
-import PuzzleIcon from '../icons/PuzzleIcon';
 import Profile from '../Profile';
 
 const PlayerManagement: React.FC = () => {
@@ -57,8 +55,6 @@ const PlayerManagement: React.FC = () => {
 
     // Calculate Summary Stats
     const totalPlayers = players.filter(p => p.role === 'player').length;
-    const totalPoints = players.reduce((sum, p) => p.role === 'player' ? sum + p.points : sum, 0);
-    const totalSolved = players.reduce((sum, p) => p.role === 'player' ? sum + p.solvedPuzzleIds.length : sum, 0);
 
     if (viewingUserId) {
         return (
@@ -83,14 +79,6 @@ const PlayerManagement: React.FC = () => {
                         <UserCircleIcon className="w-5 h-5 text-blue-400 shrink-0" />
                         <span className="font-bold shrink-0">{totalPlayers}</span> <span className="text-sm text-slate-400 shrink-0">Players</span>
                      </div>
-                     <div className="flex items-center gap-2 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700 grow justify-center md:grow-0">
-                        <TrophyIcon className="w-5 h-5 text-yellow-400 shrink-0" />
-                        <span className="font-bold shrink-0">{totalPoints}</span> <span className="text-sm text-slate-400 shrink-0">Total Points</span>
-                     </div>
-                     <div className="flex items-center gap-2 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700 grow justify-center md:grow-0">
-                        <PuzzleIcon className="w-5 h-5 text-green-400 shrink-0" />
-                        <span className="font-bold shrink-0">{totalSolved}</span> <span className="text-sm text-slate-400 shrink-0">Solved</span>
-                     </div>
                  </div>
             </header>
 
@@ -112,6 +100,7 @@ const PlayerManagement: React.FC = () => {
                                 <th className="p-4 cursor-pointer hover:text-white transition-colors" onClick={() => requestSort('email')}>Player {getSortIndicator('email')}</th>
                                 <th className="p-4 cursor-pointer hover:text-white transition-colors text-center" onClick={() => requestSort('created_at')}>Joined {getSortIndicator('created_at')}</th>
                                 <th className="p-4 cursor-pointer hover:text-white transition-colors text-center" onClick={() => requestSort('level')}>Level {getSortIndicator('level')}</th>
+                                <th className="p-4 cursor-pointer hover:text-white transition-colors text-center">Solved</th>
                                 <th className="p-4 cursor-pointer hover:text-white transition-colors text-right" onClick={() => requestSort('points')}>Points {getSortIndicator('points')}</th>
                             </tr>
                         </thead>
@@ -145,6 +134,9 @@ const PlayerManagement: React.FC = () => {
                                                 Lvl {player.level}
                                             </span>
                                         </td>
+                                        <td className="p-4 text-center text-slate-400 font-mono">
+                                            {player.solvedPuzzleIds.length}
+                                        </td>
                                         <td className="p-4 text-right font-mono text-yellow-500 font-bold">
                                             {player.points.toLocaleString()}
                                         </td>
@@ -152,7 +144,7 @@ const PlayerManagement: React.FC = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={4} className="p-12 text-center text-slate-500">
+                                    <td colSpan={5} className="p-12 text-center text-slate-500">
                                         <p className="text-lg">No players found matching your search.</p>
                                     </td>
                                 </tr>

@@ -153,7 +153,7 @@ const LoginPage: React.FC = () => {
                     <p className="text-gray-400 text-center">
                         {isForgotPassword 
                             ? 'Enter your email to receive a reset link' 
-                            : (isAdminMode ? 'Sign in to access the admin dashboard' : (isSigningUp ? 'Join the CodeQuest Arena and start solving puzzles.' : 'Sign in to access your dashboard'))}
+                            : (isAdminMode ? 'Sign in to access the admin dashboard' : (isSigningUp ? 'Join CodeQuest and start solving puzzles.' : 'Sign in to access your dashboard'))}
                     </p>
                 </div>
 

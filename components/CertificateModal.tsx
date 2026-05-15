@@ -26,8 +26,8 @@ const CertificateModal: React.FC<CertificateModalProps> = ({ user: propUser, onC
     const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
     const isQualified = user.level >= certificateRequirements.level && user.solvedPuzzleIds.length >= certificateRequirements.puzzles;
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://codequest.arena';
-    const host = typeof window !== 'undefined' ? window.location.host : 'codequest.arena';
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://codequest.app';
+    const host = typeof window !== 'undefined' ? window.location.host : 'codequest.app';
 
     React.useEffect(() => {
         // Celebrate with confetti when opening the certificate
@@ -69,8 +69,11 @@ const CertificateModal: React.FC<CertificateModalProps> = ({ user: propUser, onC
         }
     };
 
+    const isOwnProfile = state.user && state.user.id === user.id;
+
     const handleNameSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!isOwnProfile) return;
         if (name.trim() && !user.certificate_id) {
             setIsSaving(true);
             try {
@@ -141,7 +144,7 @@ const CertificateModal: React.FC<CertificateModalProps> = ({ user: propUser, onC
                                             Certificate of Achievement
                                         </h1>
                                         <p className="text-lg text-slate-600 font-medium mb-10 tracking-widest uppercase">
-                                            CodeQuest Arena
+                                            CodeQuest
                                         </p>
 
                                         <p className="text-xl text-slate-700 italic mb-4">
@@ -190,7 +193,7 @@ const CertificateModal: React.FC<CertificateModalProps> = ({ user: propUser, onC
                                         )}
                                     </div>
                                 </div>
-                            ) : (
+                            ) : isOwnProfile ? (
                                 <form 
                                     onSubmit={handleNameSubmit} 
                                     className="bg-slate-800 p-8 rounded-xl border border-slate-700 shadow-xl max-w-md w-full"
@@ -223,6 +226,16 @@ const CertificateModal: React.FC<CertificateModalProps> = ({ user: propUser, onC
                                         Generate Certificate
                                     </button>
                                 </form>
+                            ) : (
+                                <div className="text-center p-8 bg-slate-800 rounded-xl border border-slate-700">
+                                    <svg className="w-16 h-16 mx-auto text-slate-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                                    </svg>
+                                    <h2 className="text-2xl font-bold text-slate-100 mb-2">Certificate Eligible</h2>
+                                    <p className="text-slate-400">
+                                        This player is eligible for a certificate but has not claimed it yet.
+                                    </p>
+                                </div>
                             )
                         ) : (
                             <div className="text-center p-8 bg-slate-800 rounded-xl border border-slate-700">

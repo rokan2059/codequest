@@ -79,7 +79,7 @@ const VerifyCertificate: React.FC = () => {
                     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </div>
                 <h2 className="text-2xl font-bold mb-2 text-emerald-400">Verified Authentic</h2>
-                <p className="text-slate-400 mb-8">This certificate was genuinely issued by CodeQuest Arena and its details are secured in our database.</p>
+                <p className="text-slate-400 mb-8">This certificate was genuinely issued by CodeQuest and its details are secured in our database.</p>
                 
                 <div className="bg-slate-900/50 rounded-xl p-6 text-left border border-slate-700 space-y-4">
                     <div>

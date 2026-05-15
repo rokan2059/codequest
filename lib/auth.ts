@@ -106,9 +106,9 @@ export const login = async (email: string, password: string): Promise<{ success:
         id: profileNode.id,
         email: profileNode.email,
         role: profileNode.role,
-        points: profileNode.points,
-        xp: profileNode.xp,
-        level: profileNode.level,
+        points: profileNode.points || 0,
+        xp: profileNode.xp || 0,
+        level: profileNode.level || 1,
         xpToNextLevel: levelInfo.xpToNextLevel,
         solvedPuzzleIds: profileNode.solved_puzzle_ids || [],
         achievements: profileNode.achievement_ids || [],
@@ -283,7 +283,10 @@ export const resetUserProgress = async (userId: string): Promise<void> => {
             xp: 0,
             level: 1,
             solved_puzzle_ids: [],
-            achievement_ids: []
+            achievement_ids: [],
+            certificate_id: null,
+            certificate_name: null,
+            certificate_issued_at: null
         })
         .eq('id', userId);
     

@@ -17,7 +17,18 @@ const Leaderboard: React.FC = () => {
 
     const sortedPlayers = [...players]
         .filter(p => p.role !== 'admin')
-        .sort((a, b) => (b.points || 0) - (a.points || 0));
+        .sort((a, b) => {
+            if ((b.points || 0) !== (a.points || 0)) {
+                return (b.points || 0) - (a.points || 0);
+            }
+            if ((b.solvedPuzzleIds?.length || 0) !== (a.solvedPuzzleIds?.length || 0)) {
+                return (b.solvedPuzzleIds?.length || 0) - (a.solvedPuzzleIds?.length || 0);
+            }
+            if (b.level !== a.level) {
+                return b.level - a.level;
+            }
+            return (b.xp || 0) - (a.xp || 0);
+        });
 
     return (
         <div className="container mx-auto max-w-4xl fade-in">

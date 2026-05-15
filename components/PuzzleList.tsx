@@ -7,24 +7,32 @@ import LockIcon from './icons/LockIcon';
 
 // Helper for category icons
 const CategoryIcon: React.FC<{ category: string; className?: string }> = ({ category, className }) => {
-    if (category === 'JavaScript Basics') {
+    const cat = category.toLowerCase();
+    if (cat.includes('basic') || cat.includes('logic')) {
         return (
             <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
             </svg>
         );
     }
-    if (category === 'Array Methods') {
+    if (cat.includes('array') || cat.includes('string')) {
         return (
             <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
             </svg>
         );
     }
-    if (category === 'Asynchronous JS') {
+    if (cat.includes('async') || cat.includes('wait') || cat.includes('promise')) {
         return (
             <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+        );
+    }
+    if (cat.includes('object')) {
+        return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
             </svg>
         );
     }
@@ -32,10 +40,13 @@ const CategoryIcon: React.FC<{ category: string; className?: string }> = ({ cate
 };
 
 const CHAPTER_META: Record<string, { title: string; subtitle: string; description: string }> = {
-    'JavaScript Basics': { title: 'JavaScript Basics', subtitle: 'The Foundation', description: 'Master JavaScript Basics concepts.' },
-    'Array Methods': { title: 'Array Methods', subtitle: 'The Array Arsenal', description: 'Master Array Methods concepts.' },
-    'Asynchronous JS': { title: 'Asynchronous JS', subtitle: 'Async Ascension', description: 'Master Asynchronous JS concepts.' },
-    'default': { title: 'Side Quest', subtitle: 'Extra Challenges', description: 'Test your skills with these puzzles.' }
+    'JavaScript Basics': { title: 'JavaScript Basics', subtitle: 'The Foundation', description: 'Master foundational concepts and syntax.' },
+    'Arrays': { title: 'Array Mastery', subtitle: 'List Processing', description: 'Master array manipulation and higher-order functions.' },
+    'Strings': { title: 'String Sculpting', subtitle: 'Text Analysis', description: 'Learn to manipulate and transform strings like a pro.' },
+    'Objects': { title: 'Object Orientation', subtitle: 'Data Structures', description: 'Understand how to organize and access structured data.' },
+    'Async': { title: 'Async Ascension', subtitle: 'Temporal Control', description: 'Conquer promises, async/await, and non-blocking code.' },
+    'Logic': { title: 'Conditionals & Logic', subtitle: 'The Decision Maker', description: 'Sharp your Boolean logic and complex conditional flows.' },
+    'default': { title: 'Side Quest', subtitle: 'Extra Challenges', description: 'Test your skills with various programming puzzles.' }
 };
 
 const PuzzleList: React.FC = () => {
@@ -48,10 +59,7 @@ const PuzzleList: React.FC = () => {
 
     // -- Sort & Filter Logic --
     const sortedCategories = useMemo(() => {
-        return Object.keys(puzzles).sort((a, b) => {
-            // Simple sort, can be enhanced
-            return a.localeCompare(b);
-        });
+        return Object.keys(puzzles).sort();
     }, [puzzles]);
 
     // Handle clicking a category card
@@ -74,20 +82,18 @@ const PuzzleList: React.FC = () => {
         dispatch({ type: 'START_PUZZLE', payload: puzzle });
     };
 
+    // Helper for consistent level requirements
+    const getRequiredLevel = (p: Puzzle) => {
+        let req = p.requiredLevel || 1;
+        if (p.difficulty === 'Medium') req = Math.max(req, 10);
+        if (p.difficulty === 'Hard') req = Math.max(req, 25);
+        return req;
+    };
+
     // --- VIEW 1: PUZZLE DETAIL LIST (Selected Category) ---
     if (selectedCategory) {
         const categoryPuzzles = puzzles[selectedCategory] || [];
         const filteredPuzzles = categoryPuzzles.filter(p => {
-            // New Gating Logic:
-            // Easy puzzles are available at Lvl 1 (or higher if specified).
-            // Medium puzzles unlock at Lvl 10 (or higher if specified).
-            // Hard puzzles unlock at Lvl 25 (or higher if specified).
-            const userLevel = user?.level || 1;
-            
-            let requiredLevel = p.requiredLevel || 1;
-            if (p.difficulty === 'Medium') requiredLevel = Math.max(requiredLevel, 10);
-            if (p.difficulty === 'Hard') requiredLevel = Math.max(requiredLevel, 25);
-            
             const matchesDifficulty = filterDifficulty === 'All' || p.difficulty === filterDifficulty;
             const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase());
             return matchesDifficulty && matchesSearch;
@@ -147,64 +153,72 @@ const PuzzleList: React.FC = () => {
 
                 {/* Puzzles Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredPuzzles.length > 0 ? filteredPuzzles.map((puzzle) => (
-                        <div key={puzzle.id} className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-6 hover:border-blue-500/50 transition-all hover:bg-gray-800/60 flex flex-col h-full group">
-                            <div className="flex justify-between items-start mb-4">
-                                <span className={`px-2 py-1 text-xs font-semibold rounded ${
-                                    puzzle.difficulty === 'Easy' ? 'bg-green-500/20 text-green-300' :
-                                    puzzle.difficulty === 'Medium' ? 'bg-yellow-500/20 text-yellow-300' :
-                                    'bg-red-500/20 text-red-300'
-                                }`}>
-                                    {puzzle.difficulty}
-                                </span>
-                                {puzzle.requiredLevel && puzzle.requiredLevel > 1 ? (
-                                    <span className="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded">Lvl {puzzle.requiredLevel}+</span>
-                                ) : null}
-                            </div>
-                            
-                            <h3 className="text-xl font-bold text-gray-100 mb-2 group-hover:text-blue-400 transition-colors">{puzzle.title}</h3>
-                            <p className="text-gray-400 text-sm mb-6 flex-grow">{puzzle.description}</p>
-                            
-                            <div className="flex items-center justify-between pt-4 border-t border-gray-700/50">
-                                <div className="flex flex-col">
-                                    <div className="flex items-center text-yellow-400 font-bold text-sm">
-                                        <span className="mr-1 text-yellow-500">◈</span>
-                                        {puzzle.points} Pts
-                                    </div>
-                                    <div className="flex items-center text-blue-400 font-bold text-xs">
-                                        <svg className="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                        </svg>
-                                        {puzzle.xp} XP
-                                    </div>
+                    {filteredPuzzles.length > 0 ? filteredPuzzles.map((puzzle) => {
+                        const requiredLevel = getRequiredLevel(puzzle);
+                        const isLocked = (user?.level || 1) < requiredLevel;
+                        const isSolved = user?.solvedPuzzleIds.includes(puzzle.id);
+
+                        return (
+                            <div key={puzzle.id} className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-6 hover:border-blue-500/50 transition-all hover:bg-gray-800/60 flex flex-col h-full group">
+                                <div className="flex justify-between items-start mb-4">
+                                    <span className={`px-2 py-1 text-xs font-semibold rounded ${
+                                        puzzle.difficulty === 'Easy' ? 'bg-green-500/20 text-green-300' :
+                                        puzzle.difficulty === 'Medium' ? 'bg-yellow-500/20 text-yellow-300' :
+                                        'bg-red-500/20 text-red-300'
+                                    }`}>
+                                        {puzzle.difficulty}
+                                    </span>
+                                    {requiredLevel > 1 ? (
+                                        <span className={`text-xs px-2 py-1 rounded ${isLocked ? 'bg-red-500/20 text-red-300' : 'bg-purple-500/20 text-purple-300'}`}>
+                                            Lvl {requiredLevel}+
+                                        </span>
+                                    ) : null}
                                 </div>
-                                <button 
-                                    onClick={() => handleStartPuzzle(puzzle)}
-                                    disabled={puzzle.requiredLevel !== undefined && (user?.level || 1) < puzzle.requiredLevel}
-                                    className={`text-sm font-bold py-2 px-4 rounded-lg transition-colors shadow-lg shadow-blue-900/20 ${
-                                        user?.solvedPuzzleIds.includes(puzzle.id)
-                                            ? 'bg-green-600/20 text-green-400 border border-green-500/50 hover:bg-green-600/30'
-                                            : puzzle.requiredLevel !== undefined && (user?.level || 1) < puzzle.requiredLevel
-                                                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                                : 'bg-blue-600 hover:bg-blue-500 text-white'
-                                    }`}
-                                >
-                                    {user?.solvedPuzzleIds.includes(puzzle.id) ? (
-                                        <span className="flex items-center gap-1">
-                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                
+                                <h3 className="text-xl font-bold text-gray-100 mb-2 group-hover:text-blue-400 transition-colors">{puzzle.title}</h3>
+                                <p className="text-gray-400 text-sm mb-6 flex-grow">{puzzle.description}</p>
+                                
+                                <div className="flex items-center justify-between pt-4 border-t border-gray-700/50">
+                                    <div className="flex flex-col">
+                                        <div className="flex items-center text-yellow-400 font-bold text-sm">
+                                            <span className="mr-1 text-yellow-500">◈</span>
+                                            {puzzle.points} Pts
+                                        </div>
+                                        <div className="flex items-center text-blue-400 font-bold text-xs">
+                                            <svg className="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                                             </svg>
-                                            Solved
-                                        </span>
-                                    ) : puzzle.requiredLevel !== undefined && (user?.level || 1) < puzzle.requiredLevel ? (
-                                        <span className="flex items-center gap-1">
-                                            <LockIcon className="w-4 h-4" /> Locked (Lvl {puzzle.requiredLevel})
-                                        </span>
-                                    ) : 'Start Challenge'}
-                                </button>
+                                            {puzzle.xp} XP
+                                        </div>
+                                    </div>
+                                    <button 
+                                        onClick={() => handleStartPuzzle(puzzle)}
+                                        disabled={isLocked}
+                                        className={`text-sm font-bold py-2 px-4 rounded-lg transition-colors shadow-lg shadow-blue-900/20 ${
+                                            isSolved
+                                                ? 'bg-green-600/20 text-green-400 border border-green-500/50 hover:bg-green-600/30'
+                                                : isLocked
+                                                    ? 'bg-gray-700 text-gray-500 cursor-not-allowed border border-gray-600'
+                                                    : 'bg-blue-600 hover:bg-blue-500 text-white'
+                                        }`}
+                                    >
+                                        {isSolved ? (
+                                            <span className="flex items-center gap-1">
+                                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                Solved
+                                            </span>
+                                        ) : isLocked ? (
+                                            <span className="flex items-center gap-1">
+                                                <LockIcon className="w-4 h-4" /> Locked (Lvl {requiredLevel})
+                                            </span>
+                                        ) : 'Start Challenge'}
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    )) : (
+                        );
+                    }) : (
                         <div className="col-span-full text-center py-12 text-gray-500 bg-gray-800/20 rounded-xl border border-dashed border-gray-700">
                             No puzzles found matching your criteria.
                         </div>

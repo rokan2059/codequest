@@ -55,7 +55,7 @@ const Navbar: React.FC<NavbarProps> = ({ userEmail, userName, onLogout, setView,
                         <div className="flex-shrink-0">
                             <LogoIcon />
                         </div>
-                        <span className="hidden sm:block text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-indigo-500">Arena</span>
+                        <span className="hidden sm:block text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-indigo-500">CodeQuest</span>
                     </div>
                     <div className="hidden md:block">
                         <div className="ml-10 flex items-baseline space-x-4">
