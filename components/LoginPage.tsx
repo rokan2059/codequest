@@ -109,11 +109,9 @@ const LoginPage: React.FC = () => {
         setIsLoading(false);
 
         if (result.success) {
-            addToast(result.message);
+            addToast('Account created successfully! You can now sign in.');
             setIsSigningUp(false);
-            setEmail('');
             setUsername('');
-            setPassword('');
             setConfirmPassword('');
         } else {
             addToast(result.message, 'error');

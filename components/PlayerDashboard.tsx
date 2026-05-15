@@ -23,10 +23,25 @@ const PlayerDashboard: React.FC = () => {
     const topPlayers = sortedPlayers.slice(0, 3);
     const userRank = user ? sortedPlayers.findIndex((p: User) => p.id === user.id) + 1 : 0;
     
-    // Get a couple of puzzles
+    const getRequiredLevel = (p: Puzzle) => {
+        let req = p.requiredLevel || 1;
+        if (p.difficulty === 'Medium') req = Math.max(req, 10);
+        if (p.difficulty === 'Hard') req = Math.max(req, 25);
+        return req;
+    };
+
+    const userLevel = user ? user.level : 1;
+    
+    // Get a couple of puzzles that are unlocked and unsolved
     const featuredPuzzles = Object.values(puzzles)
         .flat()
-        .filter(p => user ? !user.solvedPuzzleIds.includes((p as Puzzle).id) : true)
+        .filter(p => {
+            const puzzle = p as Puzzle;
+            const req = getRequiredLevel(puzzle);
+            const isUnlocked = userLevel >= req;
+            const isUnsolved = user ? !user.solvedPuzzleIds.includes(puzzle.id) : true;
+            return isUnlocked && isUnsolved;
+        })
         .slice(0, 2);
 
     const setView = (view: 'puzzles' | 'leaderboard' | 'profile') => dispatch({ type: 'SET_VIEW', payload: view });
