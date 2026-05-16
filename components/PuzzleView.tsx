@@ -20,9 +20,12 @@ const PuzzleView: React.FC<PuzzleViewProps> = ({ puzzle }) => {
     const isAlreadySolved = state.user?.solvedPuzzleIds.includes(puzzle.id) ?? false;
 
     const getRequiredLevel = (p: Puzzle) => {
-        let req = p.requiredLevel || 1;
-        if (p.difficulty === 'Medium') req = Math.max(req, 10);
-        if (p.difficulty === 'Hard') req = Math.max(req, 25);
+        if (p.requiredLevel !== undefined && p.requiredLevel > 0) {
+            return p.requiredLevel;
+        }
+        let req = 1;
+        if (p.difficulty === 'Medium') req = 10;
+        if (p.difficulty === 'Hard') req = 25;
         return req;
     };
 
