@@ -72,6 +72,12 @@ export default function LandingPage() {
                                 >
                                    Start now <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                 </button>
+                                <button 
+                                    onClick={navigateToPuzzles}
+                                    className="w-full sm:w-auto px-8 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg font-medium transition-colors border border-slate-700"
+                                >
+                                    Browse Puzzles
+                                </button>
                             </div>
                         </motion.div>
                     </div>

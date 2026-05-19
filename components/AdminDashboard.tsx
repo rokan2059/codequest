@@ -60,15 +60,15 @@ const AdminDashboard: React.FC = () => {
                 <div className="bg-slate-800/50 backdrop-blur-md rounded-xl p-6 border border-slate-700 hover:border-sky-500 transition-colors duration-300">
                     <div className="flex items-center gap-4 mb-4">
                         <PuzzleIcon className="w-8 h-8 text-sky-400" />
-                        <h2 className="text-xl font-semibold text-slate-100">Puzzle Management</h2>
+                        <h2 className="text-xl font-semibold text-slate-100">Coding Challenges</h2>
                     </div>
                     <p className="text-slate-400 mb-4">
-                        Create, edit, and delete code puzzles. Organize them into categories and set difficulty levels.
+                        Create, edit, and delete coding challenges. Organize them into categories and set difficulty levels.
                     </p>
                     <button 
                         onClick={() => setAdminView('puzzle_management')}
                         className="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
-                        Manage Puzzles
+                        Manage Challenges
                     </button>
                 </div>
                 
@@ -80,7 +80,7 @@ const AdminDashboard: React.FC = () => {
                         <h2 className="text-xl font-semibold text-slate-100">Category Management</h2>
                     </div>
                     <p className="text-slate-400 mb-4">
-                        Create, rename, and delete the categories used to group puzzles for players.
+                        Create, rename, and delete the categories used to group challenges for players.
                     </p>
                     <button 
                         onClick={() => setAdminView('category_management')}
@@ -118,10 +118,10 @@ const AdminDashboard: React.FC = () => {
                 <div className="bg-slate-800/50 backdrop-blur-md rounded-xl p-6 border border-slate-700 hover:border-orange-500 transition-colors duration-300">
                     <div className="flex items-center gap-4 mb-4">
                         <svg className="w-8 h-8 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                        <h2 className="text-xl font-semibold text-slate-100">Achievement Maker</h2>
+                        <h2 className="text-xl font-semibold text-slate-100">Player Achievements</h2>
                     </div>
                     <p className="text-slate-400 mb-4">
-                        Create new achievements for players to earn while they solve puzzles.
+                        Create new achievements for players to earn while they solve challenges.
                     </p>
                     <button onClick={() => setAdminView('achievement_management')} className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
                         Manage Achievements

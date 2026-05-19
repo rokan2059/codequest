@@ -1,30 +1,5 @@
 import { Puzzle } from './types';
 import { supabase } from './supabase';
-import { puzzles as seedPuzzles } from '../data/puzzles';
-
-// Function to seed database if empty
-const seedDatabase = async () => {
-    const categories = Object.keys(seedPuzzles);
-    for (const cat of categories) {
-        // Ignore error if it already exists
-        await supabase.from('categories').insert([{ name: cat }]);
-        
-        for (const p of seedPuzzles[cat]) {
-            await supabase.from('puzzles').insert([{
-                id: p.id,
-                title: p.title,
-                difficulty: p.difficulty,
-                points: p.points,
-                xp: p.xp,
-                description: p.description,
-                code: p.code,
-                answer: p.answer,
-                category: p.category,
-                required_level: p.requiredLevel || 1
-            }]);
-        }
-    }
-};
 
 // Function to get puzzles from Supabase
 export const getPuzzles = async (): Promise<Record<string, Puzzle[]>> => {
@@ -50,12 +25,6 @@ export const getPuzzles = async (): Promise<Record<string, Puzzle[]>> => {
     if (error) {
         console.error('Error fetching puzzles:', error);
         throw error;
-    }
-
-    if (categoryData.length === 0 && data.length === 0) {
-        // Database is empty. Seed it asynchronously and return static for now to make preview robust
-        seedDatabase().catch(console.error);
-        return seedPuzzles;
     }
 
     data.forEach(p => {
