@@ -111,7 +111,7 @@ const AdminDashboard: React.FC = () => {
                         View the global player rankings and verify filtering for administrators.
                     </p>
                     <button onClick={() => setAdminView('leaderboard')} className="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
-                        Global Rankings
+                        Leaderboard
                     </button>
                 </div>
 

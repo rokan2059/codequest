@@ -11,7 +11,7 @@ const BLANK_FORM_STATE = {
     code: '',
     answer: '',
     xp: '0',
-    requiredLevel: '1'
+    requiredLevel: ''
 };
 
 const PuzzleManagement: React.FC = () => {
@@ -95,21 +95,23 @@ const PuzzleManagement: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-900 to-slate-900 text-white p-4 sm:p-6 lg:p-8 fade-in">
-            <header className="flex items-center mb-8">
-                 <button onClick={() => dispatch({ type: 'SET_ADMIN_VIEW', payload: 'main'})} className="mr-4 text-blue-400 hover:text-blue-300 transition-colors">
+        <div className="min-h-screen bg-gradient-to-b from-gray-900 to-slate-900 text-white fade-in">
+            <header className="sticky top-0 z-50 bg-gray-900/95 backdrop-blur border-b border-gray-800 p-4 sm:p-6 lg:p-8 flex items-center mb-8 shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+                 <button onClick={() => dispatch({ type: 'SET_ADMIN_VIEW', payload: 'main'})} className="mr-4 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-lg transition-colors font-medium border border-slate-700 flex items-center gap-2">
                     &larr; Back
                 </button>
                 <h1 className="text-3xl font-bold text-gray-100">Puzzle Management</h1>
             </header>
 
+            <div className="px-4 sm:px-6 lg:px-8 pb-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Add/Edit Puzzle Form */}
                 <div className="bg-gray-800/50 backdrop-blur-md rounded-xl p-6 border border-gray-700 self-start">
                     <h2 className="text-2xl font-semibold mb-4">{editingPuzzle ? 'Edit Puzzle' : 'Add New Puzzle'}</h2>
                     <form onSubmit={handleSubmit} className="space-y-4">
+                        <p>Puzzle Title</p>
                         <input name="title" value={formState.title} onChange={handleInputChange} placeholder="Puzzle Title" className="w-full p-2 bg-gray-900 border border-gray-700 rounded" required />
-                        
+                        <p>Puzzle Category</p>
                         <select name="category" value={formState.category} onChange={handleInputChange} className="w-full p-2 bg-gray-900 border border-gray-700 rounded" required>
                             {puzzleCategories.length === 0 ? (
                                 <option disabled value="">Create a category first</option>
@@ -121,6 +123,7 @@ const PuzzleManagement: React.FC = () => {
                         <textarea name="description" value={formState.description} onChange={handleInputChange} placeholder="Description" className="w-full p-2 bg-gray-900 border border-gray-700 rounded" rows={2}></textarea>
                         <textarea name="code" value={formState.code} onChange={handleInputChange} placeholder="Code Snippet" className="w-full p-2 bg-gray-900 border border-gray-700 rounded font-mono" rows={5} required></textarea>
                         <textarea name="answer" value={formState.answer} onChange={handleInputChange} placeholder="Correct Answer" className="w-full p-2 bg-gray-900 border border-gray-700 rounded font-mono" rows={2} required></textarea>
+                        <p>Difficulty</p>
                         <div className="flex gap-4">
                             <select name="difficulty" value={formState.difficulty} onChange={handleInputChange} className="w-full p-2 bg-gray-900 border border-gray-700 rounded">
                                 <option>Easy</option>
@@ -129,15 +132,15 @@ const PuzzleManagement: React.FC = () => {
                             </select>
                             <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-400 mb-1">Points (Leaderboard)</label>
+                                <label className="block text-sm font-medium text-gray-400 mb-1">Points</label>
                                 <input type="number" name="points" value={formState.points} onChange={handleInputChange} placeholder="10" className="w-full p-2 bg-gray-900 border border-gray-700 rounded focus:border-blue-500 focus:outline-none" required/>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-400 mb-1">XP (Leveling)</label>
+                                <label className="block text-sm font-medium text-gray-400 mb-1">XP</label>
                                 <input type="number" name="xp" value={formState.xp} onChange={handleInputChange} placeholder="150" className="w-full p-2 bg-gray-900 border border-gray-700 rounded focus:border-blue-500 focus:outline-none" required/>
                             </div>
                         </div>
-                        <input type="number" name="requiredLevel" value={formState.requiredLevel} onChange={handleInputChange} placeholder="Req Level" className="w-full p-2 bg-gray-900 border border-gray-700 rounded" required/>
+                                <input type="number" name="requiredLevel" value={formState.requiredLevel} onChange={handleInputChange} placeholder="Req Level" className="w-full p-2 bg-gray-900 border border-gray-700 rounded" required/>
                         </div>
                         <div className="flex gap-2">
                              <button type="submit" className="flex-grow bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
@@ -177,6 +180,7 @@ const PuzzleManagement: React.FC = () => {
                         ))}
                     </div>
                 </div>
+            </div>
             </div>
         </div>
     );

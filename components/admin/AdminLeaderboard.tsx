@@ -20,14 +20,15 @@ const AdminLeaderboard: React.FC = () => {
         .sort((a, b) => b.points - a.points);
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-900 to-slate-900 text-white p-4 sm:p-6 lg:p-8 fade-in">
-             <header className="flex items-center mb-8">
-                <button onClick={() => dispatch({ type: 'SET_ADMIN_VIEW', payload: 'main' })} className="mr-4 text-blue-400 hover:text-blue-300 transition-colors">
+        <div className="min-h-screen bg-gradient-to-b from-gray-900 to-slate-900 text-white fade-in">
+             <header className="sticky top-0 z-50 bg-gray-900/95 backdrop-blur border-b border-gray-800 p-4 sm:p-6 lg:p-8 flex items-center mb-8 shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+                 <button onClick={() => dispatch({ type: 'SET_ADMIN_VIEW', payload: 'main' })} className="mr-4 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-lg transition-colors font-medium border border-slate-700 flex items-center gap-2">
                     &larr; Back
                 </button>
                 <h1 className="text-3xl font-bold text-gray-100">Global Leaderboard</h1>
             </header>
 
+            <div className="px-4 sm:px-6 lg:px-8 pb-8">
             <div className="bg-slate-800/50 backdrop-blur-md rounded-xl border border-slate-700 shadow-2xl overflow-hidden">
                  <table className="w-full text-left border-collapse">
                     <thead className="bg-slate-800 text-slate-400 text-sm uppercase">
@@ -75,6 +76,7 @@ const AdminLeaderboard: React.FC = () => {
                         )}
                     </tbody>
                 </table>
+            </div>
             </div>
         </div>
     );

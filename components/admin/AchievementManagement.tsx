@@ -84,26 +84,27 @@ const AchievementManagement: React.FC = () => {
 
     return (
         <div className="p-6 bg-slate-800 rounded-xl">
-            <div className="flex justify-between items-center mb-6">
+            <div className="sticky top-0 z-50 bg-slate-800 flex justify-between items-center mb-6 pb-4 pt-2 -mx-6 px-6 border-b border-slate-700">
                 <h2 className="text-2xl font-bold text-white">
                     {editingId ? 'Edit Achievement' : 'Achievement Maker'}
                 </h2>
                 <button 
                     onClick={() => dispatch({ type: 'SET_ADMIN_VIEW', payload: 'main' })}
-                    className="flex items-center gap-2 px-3 py-1 bg-slate-700 hover:bg-slate-600 text-white rounded transition-colors text-sm"
+                    className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg transition-colors border border-slate-600"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
                     </svg>
                     Back to Dashboard
                 </button>
             </div>
             <form onSubmit={handleSave} className="space-y-4 mb-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input type="text" placeholder="Name" value={name} onChange={e => setName(e.target.value)} className="w-full p-2 bg-slate-900 border border-slate-700 rounded text-white" />
-                    <input type="text" placeholder="Icon (emoji or lucide icon name)" value={icon} onChange={e => setIcon(e.target.value)} className="w-full p-2 bg-slate-900 border border-slate-700 rounded text-white" />
+                <div>
+                    <p>Name of the achievement</p>
+                    <input type="text" value={name} onChange={e => setName(e.target.value)} className="w-full p-2 bg-slate-900 border border-slate-700 rounded text-white" />
                 </div>
-                <input type="text" placeholder="Description" value={description} onChange={e => setDescription(e.target.value)} className="w-full p-2 bg-slate-900 border border-slate-700 rounded text-white" />
+                <p>Description</p>
+                <input type="text"  value={description} onChange={e => setDescription(e.target.value)} className="w-full p-2 bg-slate-900 border border-slate-700 rounded text-white" />
                 
                 <div className="flex flex-col md:flex-row gap-4 items-start">
                     <div className="flex-1 w-full">
@@ -143,6 +144,7 @@ const AchievementManagement: React.FC = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <p>Required puzzle to unlock this achievement</p>
                     <input type="number" placeholder="Required Puzzles" value={requiredPuzzles} onChange={e => setRequiredPuzzles(Number(e.target.value))} className="w-full p-2 bg-slate-900 border border-slate-700 rounded text-white" />
                     <div className="flex gap-2">
                         <button type="submit" className="flex-1 bg-sky-600 font-bold hover:bg-sky-700 text-white py-2 px-6 rounded-lg transition-colors">

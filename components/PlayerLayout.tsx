@@ -37,8 +37,8 @@ const PlayerLayout: React.FC = () => {
             case 'reset_password': return <ResetPassword />;
             case 'verify_cert': return <VerifyCertificate />;
             case 'player_dashboard': return user ? <PlayerDashboard /> : <LoginPage />;
-            case 'puzzles': return user ? <PuzzleList /> : <LoginPage />;
-            case 'leaderboard': return user ? <Leaderboard /> : <LoginPage />;
+            case 'puzzles': return <PuzzleList />;
+            case 'leaderboard': return <Leaderboard />;
             case 'profile': return user ? <Profile /> : <LoginPage />;
             case 'puzzle_view': return user && currentPuzzle ? <PuzzleView puzzle={currentPuzzle} /> : <PuzzleList />;
             default: return user ? <PlayerDashboard /> : <LoginPage />;

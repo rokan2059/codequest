@@ -50,11 +50,22 @@ type Action =
     | { type: 'REMOVE_TOAST'; payload: number }
     | { type: 'ADD_ACHIEVEMENT'; payload: Achievement }
     | { type: 'DELETE_ACHIEVEMENT'; payload: string }
-    | { type: 'SET_CERTIFICATE_REQUIREMENTS'; payload: CertificateRequirements };
+    | { type: 'SET_CERTIFICATE_REQUIREMENTS'; payload: CertificateRequirements }
+    | { type: 'SET_INITIALIZED' };
+
+const getInitialView = (): View => {
+    try {
+        const saved = localStorage.getItem('current_view');
+        if (saved && saved !== 'login' && saved !== 'landing' && saved !== 'reset_password' && saved !== 'verify_cert') {
+            return saved as View;
+        }
+    } catch { }
+    return 'landing';
+};
 
 const initialState: AppState = {
     user: null,
-    view: 'player_dashboard',
+    view: getInitialView(),
     adminView: 'main',
     selectedCategory: null,
     currentPuzzle: null,
@@ -134,13 +145,17 @@ const appReducer = (state: AppState, action: Action): AppState => {
                 puzzles: action.payload.puzzles,
                 players: action.payload.players,
                 achievements: filteredAchievements,
-                certificateRequirements: updatedCertReq,
-                isInitialized: true
+                certificateRequirements: updatedCertReq
             };
         }
+        case 'SET_INITIALIZED':
+            return {
+                ...state,
+                isInitialized: true
+            };
         case 'LOGIN_SUCCESS':
-            // Only change view if current view is login or undefined to prevent redirect from active screens
-            const shouldChangeView = state.view === 'login' || (state.user === null && state.view === 'player_dashboard');
+            // Only change view if current view is login/landing or undefined to prevent redirect from active screens
+            const shouldChangeView = state.view === 'login' || state.view === 'landing' || (state.user === null && state.view === 'player_dashboard' && !localStorage.getItem('current_view'));
             const updatedUser = action.payload;
             
             // Re-sync the player in the players list if it exists
@@ -149,22 +164,39 @@ const appReducer = (state: AppState, action: Action): AppState => {
                 ? state.players.map(p => p.id === updatedUser.id ? updatedUser : p)
                 : [...state.players, updatedUser];
 
+            const newView = shouldChangeView 
+                    ? (updatedUser.role === 'admin' ? 'admin_dashboard' : 'player_dashboard') 
+                    : state.view;
+
+            try {
+                if (newView !== 'login' && newView !== 'landing' && newView !== 'reset_password' && newView !== 'verify_cert') {
+                    localStorage.setItem('current_view', newView);
+                }
+            } catch {}
+
             return {
                 ...state,
                 user: updatedUser,
                 players: updatedPlayers,
-                view: shouldChangeView 
-                    ? (updatedUser.role === 'admin' ? 'admin_dashboard' : 'player_dashboard') 
-                    : state.view,
+                view: newView,
                 adminView: 'main',
             };
         case 'LOGOUT':
+            try {
+                localStorage.removeItem('current_view');
+            } catch {}
             return {
                 ...initialState,
                 user: null,
-                view: 'login',
+                view: 'landing',
+                isInitialized: true
             };
         case 'SET_VIEW':
+            try {
+                if (action.payload !== 'login' && action.payload !== 'landing' && action.payload !== 'reset_password' && action.payload !== 'verify_cert') {
+                    localStorage.setItem('current_view', action.payload);
+                }
+            } catch {}
             return {
                 ...state,
                 view: action.payload,
@@ -268,9 +300,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
                 if (loggedInUser) {
                     dispatch({ type: 'LOGIN_SUCCESS', payload: loggedInUser });
                 }
+                dispatch({ type: 'SET_INITIALIZED' });
                 console.log('Data initialization attempt finished');
             } catch (error) {
                 console.error('Critical failure in initialize data:', error);
+                dispatch({ type: 'SET_INITIALIZED' }); // Ensure we still unblock the UI if init fails
             }
         };
 

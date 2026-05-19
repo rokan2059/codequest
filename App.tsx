@@ -3,6 +3,7 @@ import { AnimatePresence, motion, Transition } from 'framer-motion';
 import { useAppContext } from './context/AppContext';
 
 import LoginPage from './components/LoginPage';
+import LandingPage from './components/LandingPage';
 import AdminDashboard from './components/AdminDashboard';
 import PlayerLayout from './components/PlayerLayout';
 import ToastContainer from './components/ToastContainer';
@@ -43,10 +44,43 @@ const App: React.FC = () => {
         }
     }, [dispatch]);
 
+    if (!state.isInitialized) {
+        return (
+            <div className="min-h-screen w-full bg-background flex flex-col items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                <p className="mt-4 text-slate-400">Loading your adventure...</p>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen w-full bg-background">
             <AnimatePresence mode="wait">
-                {state.view === 'reset_password' ? (
+                {state.view === 'landing' ? (
+                    <motion.div
+                        key="landing"
+                        initial="initial"
+                        animate="in"
+                        exit="out"
+                        variants={pageVariants}
+                        transition={pageTransition}
+                        className="w-full"
+                    >
+                        <LandingPage />
+                    </motion.div>
+                ) : state.view === 'login' ? (
+                    <motion.div
+                        key="login"
+                        initial="initial"
+                        animate="in"
+                        exit="out"
+                        variants={pageVariants}
+                        transition={pageTransition}
+                        className="w-full"
+                    >
+                        <LoginPage />
+                    </motion.div>
+                ) : state.view === 'reset_password' ? (
                     <motion.div
                         key="reset_password"
                         initial="initial"
@@ -57,6 +91,19 @@ const App: React.FC = () => {
                         className="w-full"
                     >
                         <ResetPassword />
+                    </motion.div>
+                ) : state.view === 'verify_cert' ? (
+                    <motion.div
+                        key="verify_cert"
+                        initial="initial"
+                        animate="in"
+                        exit="out"
+                        variants={pageVariants}
+                        transition={pageTransition}
+                        className="w-full"
+                    >
+                        {/* We need VerifyCertificate here but I'll import it in next step */}
+                        <PlayerLayout /> {/* We can let PlayerLayout handle verify_cert for now, or just extract it. I will let PlayerLayout handle verify_cert but fix authentication */}
                     </motion.div>
                 ) : user && user.role === 'admin' ? (
                     <motion.div
@@ -70,7 +117,7 @@ const App: React.FC = () => {
                     >
                         <AdminDashboard />
                     </motion.div>
-                ) : (
+                ) : (user || state.view === 'puzzles' || state.view === 'leaderboard') ? (
                     <motion.div
                         key="player"
                         initial="initial"
@@ -81,6 +128,18 @@ const App: React.FC = () => {
                         className="w-full"
                     >
                         <PlayerLayout />
+                    </motion.div>
+                ) : (
+                    <motion.div
+                        key="landing"
+                        initial="initial"
+                        animate="in"
+                        exit="out"
+                        variants={pageVariants}
+                        transition={pageTransition}
+                        className="w-full"
+                    >
+                        <LandingPage />
                     </motion.div>
                 )}
             </AnimatePresence>

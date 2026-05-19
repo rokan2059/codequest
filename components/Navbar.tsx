@@ -51,7 +51,7 @@ const Navbar: React.FC<NavbarProps> = ({ userEmail, userName, onLogout, setView,
         <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-primary">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
-                    <div className="flex items-center gap-2 cursor-pointer" onClick={() => { setView('player_dashboard'); selectCategory(null); }}>
+                    <div className="flex items-center gap-2 cursor-pointer" onClick={() => { setView('landing'); selectCategory(null); }}>
                         <div className="flex-shrink-0">
                             <LogoIcon />
                         </div>

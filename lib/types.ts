@@ -1,5 +1,5 @@
 
-export type View = 'login' | 'admin_dashboard' | 'player_dashboard' | 'puzzles' | 'leaderboard' | 'profile' | 'puzzle_view' | 'reset_password' | 'verify_cert';
+export type View = 'landing' | 'login' | 'admin_dashboard' | 'player_dashboard' | 'puzzles' | 'leaderboard' | 'profile' | 'puzzle_view' | 'reset_password' | 'verify_cert';
 
 export interface Puzzle {
     id: string;

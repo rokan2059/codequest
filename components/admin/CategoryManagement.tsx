@@ -62,14 +62,15 @@ const CategoryManagement: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-900 to-slate-900 text-white p-4 sm:p-6 lg:p-8 fade-in">
-            <header className="flex items-center mb-8">
-                <button onClick={() => dispatch({ type: 'SET_ADMIN_VIEW', payload: 'main' })} className="mr-4 text-blue-400 hover:text-blue-300 transition-colors">
+        <div className="min-h-screen bg-gradient-to-b from-gray-900 to-slate-900 text-white fade-in">
+            <header className="sticky top-0 z-50 bg-gray-900/95 backdrop-blur border-b border-gray-800 p-4 sm:p-6 lg:p-8 flex items-center mb-8 shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+                <button onClick={() => dispatch({ type: 'SET_ADMIN_VIEW', payload: 'main' })} className="mr-4 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-lg transition-colors font-medium border border-slate-700 flex items-center gap-2">
                     &larr; Back
                 </button>
                 <h1 className="text-3xl font-bold text-gray-100">Category Management</h1>
             </header>
 
+            <div className="px-4 sm:px-6 lg:px-8 pb-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Add New Category Form */}
                 <div className="bg-gray-800/50 backdrop-blur-md rounded-xl p-6 border border-gray-700 self-start">
@@ -122,6 +123,7 @@ const CategoryManagement: React.FC = () => {
                         ))}
                     </ul>
                 </div>
+            </div>
             </div>
         </div>
     );

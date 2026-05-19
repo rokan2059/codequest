@@ -65,10 +65,10 @@ const PlayerManagement: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-900 to-slate-900 text-white p-4 sm:p-6 lg:p-8 fade-in">
-            <header className="flex flex-col md:flex-row justify-between md:items-center mb-8 gap-4">
+        <div className="min-h-screen bg-gradient-to-b from-gray-900 to-slate-900 text-white fade-in">
+            <header className="sticky top-0 z-50 bg-gray-900/95 backdrop-blur border-b border-gray-800 p-4 sm:p-6 lg:p-8 flex flex-col md:flex-row justify-between md:items-center mb-8 gap-4">
                  <div className="flex items-center">
-                    <button onClick={() => dispatch({ type: 'SET_ADMIN_VIEW', payload: 'main' })} className="mr-4 text-blue-400 hover:text-blue-300 transition-colors font-semibold">
+                    <button onClick={() => dispatch({ type: 'SET_ADMIN_VIEW', payload: 'main' })} className="mr-4 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-lg transition-colors font-medium border border-slate-700 flex items-center gap-2">
                         &larr; Back
                     </button>
                     <h1 className="text-3xl font-bold text-gray-100">Player Management</h1>
@@ -82,7 +82,8 @@ const PlayerManagement: React.FC = () => {
                  </div>
             </header>
 
-            <div className="mb-6">
+            <div className="px-4 sm:px-6 lg:px-8 pb-8">
+                <div className="mb-6">
                 <input
                     type="text"
                     placeholder="Search player by username or email..."
@@ -152,6 +153,7 @@ const PlayerManagement: React.FC = () => {
                         </tbody>
                     </table>
                 </div>
+            </div>
             </div>
         </div>
     );
