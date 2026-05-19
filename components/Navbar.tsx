@@ -52,9 +52,6 @@ const Navbar: React.FC<NavbarProps> = ({ userEmail, userName, onLogout, setView,
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     <div className="flex items-center gap-2 cursor-pointer" onClick={() => { setView('landing'); selectCategory(null); }}>
-                        <div className="flex-shrink-0">
-                            <LogoIcon />
-                        </div>
                         <span className="hidden sm:block text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-indigo-500">CodeQuest</span>
                     </div>
                     <div className="hidden md:block">

@@ -147,7 +147,6 @@ const LoginPage: React.FC = () => {
                             className="flex items-center gap-2 cursor-pointer" 
                             onClick={() => dispatch({ type: 'SET_VIEW', payload: 'landing' })}
                         >
-                            <LogoIcon className="w-8 h-8" />
                             <span className="text-2xl font-bold text-gray-100 font-mono tracking-tight">Code<span className="text-secondary">Quest</span></span>
                         </div>
                     </div>
@@ -158,7 +157,7 @@ const LoginPage: React.FC = () => {
                 <div className="w-full max-w-md bg-neutral-900/50 backdrop-blur-lg rounded-2xl shadow-2xl p-8 space-y-6 border border-primary/30">
                     <div className="flex flex-col items-center space-y-4">
                         <button onClick={handleLogoClick} className="focus:outline-none transition-transform active:scale-95 bg-transparent border-none p-0 cursor-pointer">
-                            <LogoIcon />
+                            <span className="text-4xl font-bold text-gray-100 font-mono tracking-tight">Code<span className="text-secondary">Quest</span></span>
                         </button>
                         <h1 className="text-3xl font-bold text-gray-100">
                         {isForgotPassword ? 'Reset Password' : (isAdminMode ? 'Admin Portal' : (isSigningUp ? 'Create Account' : 'Welcome Back'))}

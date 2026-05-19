@@ -31,7 +31,6 @@ export default function LandingPage() {
                         className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-cyan-400 flex items-center gap-2 cursor-pointer"
                         onClick={() => dispatch({ type: 'SET_VIEW', payload: 'landing' })}
                     >
-                        <Shield className="text-indigo-400 h-6 w-6" />
                         CodeQuest
                     </div>
                     <div className="flex items-center gap-4">

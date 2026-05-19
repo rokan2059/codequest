@@ -55,7 +55,7 @@ const ResetPassword: React.FC = () => {
                 className="w-full max-w-md bg-slate-900 rounded-2xl shadow-2xl p-8 border border-slate-800"
             >
                 <div className="flex flex-col items-center gap-4 mb-8">
-                    <LogoIcon />
+                    <span className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-indigo-500 font-mono tracking-tight">Code<span className="text-secondary">Quest</span></span>
                     <h1 className="text-3xl font-bold text-slate-100">Reset Password</h1>
                     <p className="text-slate-400 text-center">Enter your new password below.</p>
                 </div>

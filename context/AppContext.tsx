@@ -185,10 +185,12 @@ const appReducer = (state: AppState, action: Action): AppState => {
                 localStorage.setItem('current_view', 'landing');
             } catch {}
             return {
-                ...initialState,
+                ...state,
                 user: null,
                 view: 'landing',
-                isInitialized: true
+                selectedCategory: null,
+                currentPuzzle: null,
+                adminView: 'main'
             };
         case 'SET_VIEW':
             try {
