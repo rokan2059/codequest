@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 // FIX: Corrected import paths for icons, assuming Navbar.tsx is in the root directory.
-import LogoIcon from './icons/LogoIcon';
 import LogoutIcon from './icons/LogoutIcon';
 import { View } from '../lib/types';
 import { Menu, X } from 'lucide-react';

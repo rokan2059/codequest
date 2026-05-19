@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import LogoIcon from './icons/LogoIcon';
 import { useAppContext } from '../context/AppContext';
 import { supabase } from '../lib/supabase';
 

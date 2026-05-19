@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import * as Auth from '../lib/auth';
-import LogoIcon from './icons/LogoIcon';
 
 const ResetPassword: React.FC = () => {
     const { addToast, dispatch } = useAppContext();
