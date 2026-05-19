@@ -1,5 +1,6 @@
 import { Puzzle } from './types';
 import { supabase } from './supabase';
+import { puzzles as defaultPuzzles } from '../data/puzzles';
 
 // Function to get puzzles from Supabase
 export const getPuzzles = async (): Promise<Record<string, Puzzle[]>> => {
@@ -13,6 +14,38 @@ export const getPuzzles = async (): Promise<Record<string, Puzzle[]>> => {
         throw categoryError;
     }
     
+    // Seed initial data if empty
+    if (!categoryData || categoryData.length === 0) {
+        // Insert categories
+        const categories = Object.keys(defaultPuzzles).map(name => ({ name }));
+        const { error: seedCatError } = await supabase.from('categories').insert(categories);
+        if (seedCatError) console.error('Error seed categories', seedCatError);
+        
+        // Insert puzzles
+        const puzzlesToInsert = [];
+        for (const [category, puzzleList] of Object.entries(defaultPuzzles)) {
+            for (const p of puzzleList) {
+                puzzlesToInsert.push({
+                    id: p.id,
+                    title: p.title,
+                    difficulty: p.difficulty,
+                    points: p.points,
+                    xp: p.xp,
+                    description: p.description,
+                    code: p.code,
+                    answer: p.answer,
+                    category: p.category,
+                    required_level: p.requiredLevel || 1
+                });
+            }
+        }
+        const { error: seedPuzError } = await supabase.from('puzzles').insert(puzzlesToInsert);
+        if (seedPuzError) console.error('Error seed puzzles', seedPuzError);
+        
+        // return default puzzles
+        return defaultPuzzles;
+    }
+
     const puzzlesByCategory: Record<string, Puzzle[]> = {};
     categoryData.forEach(c => {
         puzzlesByCategory[c.name] = [];
@@ -27,11 +60,11 @@ export const getPuzzles = async (): Promise<Record<string, Puzzle[]>> => {
         throw error;
     }
 
-    data.forEach(p => {
+    data.forEach((p: any) => {
         const puzzle: Puzzle = {
             id: p.id,
             title: p.title,
-            difficulty: p.difficulty as any,
+            difficulty: p.difficulty,
             points: p.points,
             xp: p.xp,
             description: p.description,

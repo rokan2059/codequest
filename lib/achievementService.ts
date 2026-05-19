@@ -1,5 +1,6 @@
 import { Achievement, User } from './types';
 import { supabase } from './supabase';
+import { achievements as defaultAchievements } from '../data/achievements';
 
 export const getAchievements = async (): Promise<Achievement[]> => {
     const { data, error } = await supabase
@@ -9,6 +10,22 @@ export const getAchievements = async (): Promise<Achievement[]> => {
     if (error) {
         console.error('Error fetching achievements:', error);
         throw error;
+    }
+
+    if (!data || data.length === 0) {
+        const achievementsToInsert = defaultAchievements.map(a => ({
+            id: a.id,
+            name: a.name,
+            description: a.description,
+            icon: a.icon,
+            image_url: a.imageUrl,
+            required_puzzles: a.requiredPuzzles
+        }));
+        
+        const { error: seedError } = await supabase.from('achievements').insert(achievementsToInsert);
+        if (seedError) console.error('Error seeding achievements:', seedError);
+        
+        return defaultAchievements;
     }
 
     return data.map(a => ({
