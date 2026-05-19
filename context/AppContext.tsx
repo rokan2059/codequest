@@ -56,7 +56,7 @@ type Action =
 const getInitialView = (): View => {
     try {
         const saved = localStorage.getItem('current_view');
-        if (saved && saved !== 'login' && saved !== 'landing' && saved !== 'reset_password' && saved !== 'verify_cert') {
+        if (saved) {
             return saved as View;
         }
     } catch { }
@@ -154,8 +154,9 @@ const appReducer = (state: AppState, action: Action): AppState => {
                 isInitialized: true
             };
         case 'LOGIN_SUCCESS':
-            // Only change view if current view is login/landing or undefined to prevent redirect from active screens
-            const shouldChangeView = state.view === 'login' || state.view === 'landing' || (state.user === null && state.view === 'player_dashboard' && !localStorage.getItem('current_view'));
+            // Only change view if current view is login, or if they haven't saved a view yet
+            const savedView = localStorage.getItem('current_view');
+            const shouldChangeView = state.view === 'login' || !savedView;
             const updatedUser = action.payload;
             
             // Re-sync the player in the players list if it exists
@@ -165,13 +166,11 @@ const appReducer = (state: AppState, action: Action): AppState => {
                 : [...state.players, updatedUser];
 
             const newView = shouldChangeView 
-                    ? (updatedUser.role === 'admin' ? 'admin_dashboard' : 'player_dashboard') 
+                    ? (updatedUser.role === 'admin' ? 'admin_dashboard' : 'puzzles') 
                     : state.view;
 
             try {
-                if (newView !== 'login' && newView !== 'landing' && newView !== 'reset_password' && newView !== 'verify_cert') {
-                    localStorage.setItem('current_view', newView);
-                }
+                localStorage.setItem('current_view', newView);
             } catch {}
 
             return {
@@ -183,7 +182,7 @@ const appReducer = (state: AppState, action: Action): AppState => {
             };
         case 'LOGOUT':
             try {
-                localStorage.removeItem('current_view');
+                localStorage.setItem('current_view', 'landing');
             } catch {}
             return {
                 ...initialState,
@@ -193,9 +192,7 @@ const appReducer = (state: AppState, action: Action): AppState => {
             };
         case 'SET_VIEW':
             try {
-                if (action.payload !== 'login' && action.payload !== 'landing' && action.payload !== 'reset_password' && action.payload !== 'verify_cert') {
-                    localStorage.setItem('current_view', action.payload);
-                }
+                localStorage.setItem('current_view', action.payload);
             } catch {}
             return {
                 ...state,
@@ -213,6 +210,9 @@ const appReducer = (state: AppState, action: Action): AppState => {
                 selectedCategory: action.payload,
             };
         case 'START_PUZZLE':
+            try {
+                localStorage.setItem('current_view', 'puzzle_view');
+            } catch {}
             return {
                 ...state,
                 currentPuzzle: action.payload,

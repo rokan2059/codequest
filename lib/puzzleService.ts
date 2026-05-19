@@ -15,12 +15,35 @@ export const getPuzzles = async (): Promise<Record<string, Puzzle[]>> => {
     }
     
     // Seed initial data if empty
-    if (!categoryData || categoryData.length === 0) {
+    let currentCategoryData = categoryData || [];
+    if (!currentCategoryData || currentCategoryData.length === 0) {
         // Insert categories
         const categories = Object.keys(defaultPuzzles).map(name => ({ name }));
         const { error: seedCatError } = await supabase.from('categories').insert(categories);
         if (seedCatError) console.error('Error seed categories', seedCatError);
         
+        // Refresh category data
+        const { data: newCatData } = await supabase.from('categories').select('*');
+        if (newCatData) currentCategoryData = newCatData;
+    }
+
+    const puzzlesByCategory: Record<string, Puzzle[]> = {};
+    currentCategoryData.forEach(c => {
+        puzzlesByCategory[c.name] = [];
+    });
+
+    const { data, error } = await supabase
+        .from('puzzles')
+        .select('*');
+    
+    if (error) {
+        console.error('Error fetching puzzles:', error);
+        throw error;
+    }
+
+    let finalPuzzleData = data || [];
+
+    if (!finalPuzzleData || finalPuzzleData.length === 0) {
         // Insert puzzles
         const puzzlesToInsert = [];
         for (const [category, puzzleList] of Object.entries(defaultPuzzles)) {
@@ -42,25 +65,12 @@ export const getPuzzles = async (): Promise<Record<string, Puzzle[]>> => {
         const { error: seedPuzError } = await supabase.from('puzzles').insert(puzzlesToInsert);
         if (seedPuzError) console.error('Error seed puzzles', seedPuzError);
         
-        // return default puzzles
-        return defaultPuzzles;
+        // Refresh puzzle data
+        const { data: newPuzData } = await supabase.from('puzzles').select('*');
+        if (newPuzData) finalPuzzleData = newPuzData;
     }
 
-    const puzzlesByCategory: Record<string, Puzzle[]> = {};
-    categoryData.forEach(c => {
-        puzzlesByCategory[c.name] = [];
-    });
-
-    const { data, error } = await supabase
-        .from('puzzles')
-        .select('*');
-    
-    if (error) {
-        console.error('Error fetching puzzles:', error);
-        throw error;
-    }
-
-    data.forEach((p: any) => {
+    finalPuzzleData.forEach((p: any) => {
         const puzzle: Puzzle = {
             id: p.id,
             title: p.title,
