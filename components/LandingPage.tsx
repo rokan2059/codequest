@@ -4,10 +4,14 @@ import { Shield, Target, Award, ArrowRight, Zap, Code } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 
 export default function LandingPage() {
-    const { dispatch } = useAppContext();
+    const { state, dispatch } = useAppContext();
 
     const navigateToLogin = () => {
-        dispatch({ type: 'SET_VIEW', payload: 'login' });
+        if (state.user) {
+            dispatch({ type: 'SET_VIEW', payload: state.user.role === 'admin' ? 'admin_dashboard' : 'puzzles' });
+        } else {
+            dispatch({ type: 'SET_VIEW', payload: 'login' });
+        }
     };
 
     const navigateToPuzzles = () => {
@@ -35,7 +39,7 @@ export default function LandingPage() {
                             onClick={navigateToLogin}
                             className="text-sm font-medium bg-indigo-600 hover:bg-indigo-500 text-white transition-colors px-4 py-2 rounded-md ml-2"
                         >
-                            Sign In
+                            {state.user ? 'Dashboard' : 'Sign In'}
                         </button>
                     </div>
                 </div>

@@ -139,13 +139,28 @@ const LoginPage: React.FC = () => {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-background p-4">
-            <div className="w-full max-w-md bg-background backdrop-blur-lg rounded-2xl shadow-2xl p-8 space-y-6 border border-primary">
-                <div className="flex flex-col items-center space-y-4">
-                    <button onClick={handleLogoClick} className="focus:outline-none transition-transform active:scale-95 bg-transparent border-none p-0 cursor-pointer">
-                        <LogoIcon />
-                    </button>
-                    <h1 className="text-3xl font-bold text-gray-100">
+        <div className="min-h-screen bg-background flex flex-col">
+            <nav className="w-full bg-background/80 backdrop-blur-md border-b border-primary/20 sticky top-0 z-50">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center justify-between h-16">
+                        <div 
+                            className="flex items-center gap-2 cursor-pointer" 
+                            onClick={() => dispatch({ type: 'SET_VIEW', payload: 'landing' })}
+                        >
+                            <LogoIcon className="w-8 h-8" />
+                            <span className="text-2xl font-bold text-gray-100 font-mono tracking-tight">Code<span className="text-secondary">Quest</span></span>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <div className="flex-1 flex items-center justify-center p-4">
+                <div className="w-full max-w-md bg-neutral-900/50 backdrop-blur-lg rounded-2xl shadow-2xl p-8 space-y-6 border border-primary/30">
+                    <div className="flex flex-col items-center space-y-4">
+                        <button onClick={handleLogoClick} className="focus:outline-none transition-transform active:scale-95 bg-transparent border-none p-0 cursor-pointer">
+                            <LogoIcon />
+                        </button>
+                        <h1 className="text-3xl font-bold text-gray-100">
                         {isForgotPassword ? 'Reset Password' : (isAdminMode ? 'Admin Portal' : (isSigningUp ? 'Create Account' : 'Welcome Back'))}
                     </h1>
                     <p className="text-gray-400 text-center">
@@ -304,6 +319,7 @@ const LoginPage: React.FC = () => {
                     </button>
                 </p>
             </div>
+          </div>
         </div>
     );
 };
