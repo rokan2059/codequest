@@ -46,29 +46,39 @@ const PlayerLayout: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-background text-white">
-            <Navbar 
-                userEmail={user?.email} 
-                userName={user?.username}
-                onLogout={user ? logout : undefined} 
-                setView={setView} 
-                selectCategory={selectCategory}
-                activeView={view} 
+        <div className="flex flex-col min-h-screen bg-background text-white relative overflow-hidden">
+            {/* Ambient user dashboard background wallpaper */}
+            <div 
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.06] pointer-events-none mix-blend-screen z-0"
+                style={{ backgroundImage: "url('/iStock-869356340.jpg')" }}
             />
-            <main className="flex-grow p-4 sm:p-6 lg:p-8">
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={view}
-                        initial="initial"
-                        animate="in"
-                        exit="out"
-                        variants={pageVariants}
-                        transition={pageTransition}
-                    >
-                        {renderView()}
-                    </motion.div>
-                </AnimatePresence>
-            </main>
+            {/* Subtle overlay to guarantee high-contrast text rendering */}
+            <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/85 to-background z-0 pointer-events-none" />
+
+            <div className="relative z-10 flex flex-col min-h-screen">
+                <Navbar 
+                    userEmail={user?.email} 
+                    userName={user?.username}
+                    onLogout={user ? logout : undefined} 
+                    setView={setView} 
+                    selectCategory={selectCategory}
+                    activeView={view} 
+                />
+                <main className="flex-grow p-4 sm:p-6 lg:p-8">
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={view}
+                            initial="initial"
+                            animate="in"
+                            exit="out"
+                            variants={pageVariants}
+                            transition={pageTransition}
+                        >
+                            {renderView()}
+                        </motion.div>
+                    </AnimatePresence>
+                </main>
+            </div>
         </div>
     );
 };

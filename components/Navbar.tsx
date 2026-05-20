@@ -55,7 +55,7 @@ const Navbar: React.FC<NavbarProps> = ({ userEmail, userName, onLogout, setView,
                     </div>
                     <div className="hidden md:block">
                         <div className="ml-10 flex items-baseline space-x-4">
-                            <NavLink label="Dashboard" isActive={activeView === 'player_dashboard'} onClick={() => handleViewChange('player_dashboard')} />
+                            <NavLink label="Home" isActive={activeView === 'player_dashboard'} onClick={() => handleViewChange('player_dashboard')} />
                             <NavLink label="Puzzles" isActive={activeView === 'puzzles' || activeView === 'puzzle_view'} onClick={handlePuzzlesClick} />
                             <NavLink label="Leaderboard" isActive={activeView === 'leaderboard'} onClick={() => handleViewChange('leaderboard')} />
                             {userEmail && <NavLink label="Profile" isActive={activeView === 'profile'} onClick={() => handleViewChange('profile')} />}
@@ -103,7 +103,7 @@ const Navbar: React.FC<NavbarProps> = ({ userEmail, userName, onLogout, setView,
             {isMobileMenuOpen && (
                 <div className="md:hidden bg-background border-b border-primary">
                     <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 flex flex-col">
-                        <NavLink label="Dashboard" isActive={activeView === 'player_dashboard'} onClick={() => handleViewChange('player_dashboard')} />
+                        <NavLink label="Home" isActive={activeView === 'player_dashboard'} onClick={() => handleViewChange('player_dashboard')} />
                         <NavLink label="Puzzles" isActive={activeView === 'puzzles' || activeView === 'puzzle_view'} onClick={handlePuzzlesClick} />
                         <NavLink label="Leaderboard" isActive={activeView === 'leaderboard'} onClick={() => handleViewChange('leaderboard')} />
                         {userEmail && <NavLink label="Profile" isActive={activeView === 'profile'} onClick={() => handleViewChange('profile')} />}

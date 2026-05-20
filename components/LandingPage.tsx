@@ -23,7 +23,13 @@ export default function LandingPage() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-950 text-slate-50 font-sans selection:bg-indigo-500/30">
+        <div className="min-h-screen bg-slate-950 text-slate-50 font-sans selection:bg-indigo-500/30 relative overflow-hidden">
+            {/* Global background wallpaper with low subtle opacity */}
+            <div 
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.05] pointer-events-none mix-blend-screen z-0"
+                style={{ backgroundImage: "url('/code-design-creative-wallpaper-featuring-intricate-patterns-computer-code-technology-art-to-offer-modern-code-design-355060656.webp')" }}
+            />
+
             {/* Minimal Header */}
             <header className="fixed top-0 w-full bg-slate-950/80 backdrop-blur-md z-50 border-b border-slate-800">
                 <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -36,7 +42,7 @@ export default function LandingPage() {
                     <div className="flex items-center gap-4">
                         <button 
                             onClick={navigateToLogin}
-                            className="text-sm font-medium bg-indigo-600 hover:bg-indigo-500 text-white transition-colors px-4 py-2 rounded-md ml-2"
+                            className="text-sm font-medium bg-indigo-600 hover:bg-indigo-500 text-white transition-colors px-4 py-2 rounded-md ml-2 relative z-50"
                         >
                             {state.user ? 'Dashboard' : 'Sign In'}
                         </button>
@@ -45,9 +51,16 @@ export default function LandingPage() {
             </header>
 
             {/* Hero Section */}
-            <main>
+            <main className="relative z-10">
                 <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
-                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-950 to-slate-950"></div>
+                    {/* Dark gradient overlay */}
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-950/40 via-slate-950/90 to-slate-950 z-0"></div>
+                    
+                    {/* Highly aesthetic hero image overlay */}
+                    <div 
+                        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.16] pointer-events-none mix-blend-color-dodge z-0"
+                        style={{ backgroundImage: "url('/code-design-creative-wallpaper-featuring-intricate-patterns-computer-code-technology-art-to-offer-modern-code-design-355060656.webp')" }}
+                    />
                     
                     <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
                         <motion.div

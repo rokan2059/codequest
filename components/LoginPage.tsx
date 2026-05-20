@@ -138,9 +138,17 @@ const LoginPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-background flex flex-col">
-            <div className="flex-1 flex items-center justify-center p-4">
-                <div className="w-full max-w-md bg-neutral-900/50 backdrop-blur-lg rounded-2xl shadow-2xl p-8 space-y-6 border border-primary/30">
+        <div className="min-h-screen bg-background flex flex-col relative overflow-hidden">
+            {/* Ambient background wallpaper */}
+            <div 
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.22] pointer-events-none mix-blend-color-dodge z-0"
+                style={{ backgroundImage: "url('/creative-coding-backdrop-dark-text-programming-future-concept-d-rendering-147291480.webp')" }}
+            />
+            {/* Dark gradient overlay to ensure top-notch readability and high contrast */}
+            <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/85 to-background z-0 pointer-events-none" />
+
+            <div className="flex-1 flex items-center justify-center p-4 relative z-10">
+                <div className="w-full max-w-md bg-neutral-900/80 backdrop-blur-xl rounded-2xl shadow-2xl p-8 space-y-6 border border-primary/30">
                     <div className="flex flex-col items-center space-y-4">
                         <button 
                             onClick={handleLogoClick} 
