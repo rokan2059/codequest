@@ -139,24 +139,19 @@ const LoginPage: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-background flex flex-col">
-            <nav className="w-full bg-background/80 backdrop-blur-md border-b border-primary/20 sticky top-0 z-50">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-16">
-                        <div 
-                            className="flex items-center gap-2 cursor-pointer" 
-                            onClick={() => dispatch({ type: 'SET_VIEW', payload: 'landing' })}
-                        >
-                            <span className="text-2xl font-bold text-gray-100 font-mono tracking-tight">Code<span className="text-secondary">Quest</span></span>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-
             <div className="flex-1 flex items-center justify-center p-4">
                 <div className="w-full max-w-md bg-neutral-900/50 backdrop-blur-lg rounded-2xl shadow-2xl p-8 space-y-6 border border-primary/30">
                     <div className="flex flex-col items-center space-y-4">
-                        <button onClick={handleLogoClick} className="focus:outline-none transition-transform active:scale-95 bg-transparent border-none p-0 cursor-pointer">
-                            <span className="text-4xl font-bold text-gray-100 font-mono tracking-tight">Code<span className="text-secondary">Quest</span></span>
+                        <button 
+                            onClick={handleLogoClick} 
+                            className="group/logo focus:outline-none transition-all duration-300 hover:scale-105 hover:rotate-1 active:scale-95 bg-transparent border-none p-0 cursor-pointer"
+                        >
+                            <span className="text-4xl font-bold font-mono tracking-tight text-gray-100 group-hover/logo:text-white transition-colors duration-300">
+                                Code
+                                <span className="text-secondary group-hover/logo:text-green-400 group-hover/logo:drop-shadow-[0_0_12px_rgba(16,185,129,0.5)] transition-all duration-300">
+                                    Quest
+                                </span>
+                            </span>
                         </button>
                         <h1 className="text-3xl font-bold text-gray-100">
                         {isForgotPassword ? 'Reset Password' : (isAdminMode ? 'Admin Portal' : (isSigningUp ? 'Create Account' : 'Welcome Back'))}
@@ -316,6 +311,15 @@ const LoginPage: React.FC = () => {
                         {isSigningUp ? 'Sign in' : 'Sign up'}
                     </button>
                 </p>
+
+                <div className="text-center !mt-6 pt-4 border-t border-primary/20">
+                    <button 
+                        onClick={() => dispatch({ type: 'SET_VIEW', payload: 'landing' })} 
+                        className="text-sm font-medium text-gray-400 hover:text-gray-200 transition-colors inline-flex items-center gap-1.5"
+                    >
+                        ← Back to Home
+                    </button>
+                </div>
             </div>
           </div>
         </div>

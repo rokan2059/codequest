@@ -59,7 +59,7 @@ export default function LandingPage() {
                                 <Zap className="w-4 h-4" /> The Ultimate Coding Challenge
                             </span>
                             <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8">
-                                Master Code.<br />
+                                CodeQuest.<br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-cyan-400 to-emerald-400">
                                     Conquer Puzzles.
                                 </span>
