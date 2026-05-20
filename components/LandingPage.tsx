@@ -68,9 +68,7 @@ export default function LandingPage() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5 }}
                         >
-                            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-300 text-sm font-medium mb-8 border border-indigo-500/20">
-                                <Zap className="w-4 h-4" /> The Ultimate Coding Challenge
-                            </span>
+
                             <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8">
                                 CodeQuest.<br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-cyan-400 to-emerald-400">

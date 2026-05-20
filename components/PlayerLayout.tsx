@@ -49,8 +49,8 @@ const PlayerLayout: React.FC = () => {
         <div className="flex flex-col min-h-screen bg-background text-white relative overflow-hidden">
             {/* Ambient user dashboard background wallpaper */}
             <div 
-                className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.06] pointer-events-none mix-blend-screen z-0"
-                style={{ backgroundImage: "url('/iStock-869356340.jpg')" }}
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.11] pointer-events-none mix-blend-screen z-0"
+                style={{ backgroundImage: "url('/11.webp')" }}
             />
             {/* Subtle overlay to guarantee high-contrast text rendering */}
             <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/85 to-background z-0 pointer-events-none" />
