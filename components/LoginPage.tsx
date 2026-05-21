@@ -325,7 +325,7 @@ const LoginPage: React.FC = () => {
                         onClick={() => dispatch({ type: 'SET_VIEW', payload: 'landing' })} 
                         className="text-sm font-medium text-gray-400 hover:text-gray-200 transition-colors inline-flex items-center gap-1.5"
                     >
-                        ← Back to Home
+                        ← Return
                     </button>
                 </div>
             </div>
