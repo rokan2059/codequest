@@ -164,7 +164,7 @@ const AchievementManagement: React.FC = () => {
                     <div key={a.id} className="flex justify-between items-center bg-slate-900 p-4 rounded-lg border border-slate-700 text-white">
                         <div className="flex items-center">
                             {a.imageUrl ? (
-                                <img src={a.imageUrl} alt={a.name} className="w-10 h-10 object-cover rounded-full mr-3 border border-slate-600" />
+                                <img src={a.imageUrl} alt={a.name} referrerPolicy="no-referrer" className="w-10 h-10 object-cover rounded-full mr-3 border border-slate-600" />
                             ) : (
                                 <span className="text-2xl mr-3">{a.icon}</span>
                             )}

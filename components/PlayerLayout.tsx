@@ -49,7 +49,7 @@ const PlayerLayout: React.FC = () => {
         <div className="flex flex-col min-h-screen bg-background text-white relative overflow-hidden">
             {/* Ambient user dashboard background wallpaper */}
             <div 
-                className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.11] pointer-events-none mix-blend-screen z-0"
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.35] pointer-events-none mix-blend-screen z-0"
                 style={{ backgroundImage: "url('/11.webp')" }}
             />
             {/* Subtle overlay to guarantee high-contrast text rendering */}
@@ -59,6 +59,7 @@ const PlayerLayout: React.FC = () => {
                 <Navbar 
                     userEmail={user?.email} 
                     userName={user?.username}
+                    avatarUrl={user?.avatarUrl}
                     onLogout={user ? logout : undefined} 
                     setView={setView} 
                     selectCategory={selectCategory}

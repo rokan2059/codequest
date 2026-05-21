@@ -141,7 +141,7 @@ const LoginPage: React.FC = () => {
         <div className="min-h-screen bg-background flex flex-col relative overflow-hidden">
             {/* Ambient background wallpaper */}
             <div 
-                className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.22] pointer-events-none mix-blend-color-dodge z-0"
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.45] pointer-events-none mix-blend-color-dodge z-0"
                 style={{ backgroundImage: "url('/creative-coding-backdrop-dark-text-programming-future-concept-d-rendering-147291480.webp')" }}
             />
             {/* Dark gradient overlay to ensure top-notch readability and high contrast */}

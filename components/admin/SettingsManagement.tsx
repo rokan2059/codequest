@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAppContext } from '../../context/AppContext';
 
 const SettingsManagement: React.FC = () => {
-    const { state, updateCertificateRequirements, dispatch, addToast } = useAppContext();
+    const { state, updateCertificateRequirements, dispatch } = useAppContext();
     const { certificateRequirements } = state;
 
     const [levelReq, setLevelReq] = useState(certificateRequirements.level.toString());
@@ -15,7 +15,7 @@ const SettingsManagement: React.FC = () => {
         const puzzles = parseInt(puzzlesReq);
 
         if (isNaN(level) || isNaN(puzzles) || level < 1 || puzzles < 1) {
-            addToast('Please enter valid numbers greater than 0.', 'error');
+            alert('Please enter valid numbers greater than 0.');
             return;
         }
 

@@ -8,6 +8,7 @@ import { Menu, X } from 'lucide-react';
 interface NavbarProps {
     userEmail?: string;
     userName?: string;
+    avatarUrl?: string;
     onLogout?: () => void;
     setView: (view: View) => void;
     selectCategory: (category: string | null) => void;
@@ -31,7 +32,7 @@ const NavLink: React.FC<{
     </button>
 );
 
-const Navbar: React.FC<NavbarProps> = ({ userEmail, userName, onLogout, setView, selectCategory, activeView }) => {
+const Navbar: React.FC<NavbarProps> = ({ userEmail, userName, avatarUrl, onLogout, setView, selectCategory, activeView }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     
     const displayName = userName || (userEmail ? 'Challenger' : undefined);
@@ -63,8 +64,8 @@ const Navbar: React.FC<NavbarProps> = ({ userEmail, userName, onLogout, setView,
                     </div>
                     <div className="hidden md:flex items-center">
                          {displayName ? (
-                             <>
-                                 <span className="text-gray-400 text-sm mr-4">{displayName}</span>
+                              <>
+                                 <span className="text-gray-400 text-sm mr-4 cursor-pointer hover:text-white transition-colors" onClick={() => handleViewChange('profile')}>{displayName}</span>
                                  <button
                                      onClick={onLogout}
                                      title="Log Out"
@@ -110,8 +111,18 @@ const Navbar: React.FC<NavbarProps> = ({ userEmail, userName, onLogout, setView,
                     </div>
                     <div className="pt-4 pb-3 border-t border-gray-700">
                         {displayName ? (
-                            <div className="flex items-center px-5 flex-col gap-4">
-                                <div className="text-base font-medium text-white">{displayName}</div>
+                            <div className="flex items-center px-5 flex-col gap-3">
+                                <div 
+                                    onClick={() => handleViewChange('profile')} 
+                                    className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center border-2 border-primary cursor-pointer"
+                                >
+                                    {avatarUrl ? (
+                                        <img src={avatarUrl} alt="Avatar" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <span className="text-sm font-bold text-slate-300">{(userName || userEmail || 'P').charAt(0).toUpperCase()}</span>
+                                    )}
+                                </div>
+                                <div className="text-base font-medium text-white cursor-pointer" onClick={() => handleViewChange('profile')}>{displayName}</div>
                                 <button
                                     onClick={() => {
                                         if (onLogout) onLogout();

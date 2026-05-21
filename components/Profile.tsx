@@ -69,7 +69,7 @@ const Profile: React.FC<ProfileProps> = ({ userId, onClose }) => {
                 <div className="relative inline-block group">
                     <div className="w-24 h-24 rounded-full bg-sky-500/20 mx-auto flex items-center justify-center border-2 border-sky-400 mb-4 overflow-hidden">
                         {displayUser.avatarUrl ? (
-                            <img src={displayUser.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                            <img src={displayUser.avatarUrl} alt="Avatar" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                         ) : (
                             <span className="text-4xl font-bold text-slate-100">{(displayUser.username || displayUser.email).charAt(0).toUpperCase()}</span>
                         )}
@@ -93,7 +93,7 @@ const Profile: React.FC<ProfileProps> = ({ userId, onClose }) => {
                             />
                             <button 
                                 onClick={() => avatarInputRef.current?.click()}
-                                className="absolute bottom-4 right-0 p-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-full shadow-lg border border-slate-900 transition-all opacity-0 group-hover:opacity-100"
+                                className="absolute bottom-0 right-0 p-2 bg-sky-600 hover:bg-sky-500 text-white rounded-full shadow-lg border border-slate-900 transition-all hover:scale-110 active:scale-95"
                                 title="Change Profile Picture"
                             >
                                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
@@ -179,7 +179,7 @@ const Profile: React.FC<ProfileProps> = ({ userId, onClose }) => {
                                             </div>
                                         )}
                                         {ach.imageUrl ? (
-                                            <img src={ach.imageUrl} alt={ach.name} className="w-16 h-16 object-cover rounded-full mb-2" />
+                                            <img src={ach.imageUrl} alt={ach.name} referrerPolicy="no-referrer" className="w-16 h-16 object-cover rounded-full mb-2" />
                                         ) : (
                                             <div className="text-5xl mb-2">{ach.icon}</div>
                                         )}

@@ -50,7 +50,7 @@ const Leaderboard: React.FC = () => {
                                         </div>
                                         <div className="w-10 h-10 rounded-full bg-slate-700 shrink-0 overflow-hidden flex items-center justify-center border border-slate-600">
                                             {player.avatarUrl ? (
-                                                <img src={player.avatarUrl} alt="" className="w-full h-full object-cover" />
+                                                <img src={player.avatarUrl} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                                             ) : (
                                                 <span className="text-xs font-bold text-slate-300">{(player.username || 'P').charAt(0).toUpperCase()}</span>
                                             )}

@@ -117,7 +117,7 @@ const PlayerManagement: React.FC = () => {
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-300 font-bold border border-blue-500/30 shrink-0 overflow-hidden">
                                                     {player.avatarUrl ? (
-                                                        <img src={player.avatarUrl} alt="" className="w-full h-full object-cover" />
+                                                        <img src={player.avatarUrl} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                                                     ) : (
                                                         (player.username || player.email).charAt(0).toUpperCase()
                                                     )}

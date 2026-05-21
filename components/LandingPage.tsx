@@ -22,7 +22,7 @@ export default function LandingPage() {
         <div className="min-h-screen bg-slate-950 text-slate-50 font-sans selection:bg-indigo-500/30 relative overflow-hidden">
             {/* Global background wallpaper with low subtle opacity */}
             <div 
-                className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.05] pointer-events-none mix-blend-screen z-0"
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.25] pointer-events-none mix-blend-screen z-0"
                 style={{ backgroundImage: "url('/code-design-creative-wallpaper-featuring-intricate-patterns-computer-code-technology-art-to-offer-modern-code-design-355060656.webp')" }}
             />
 
@@ -54,7 +54,7 @@ export default function LandingPage() {
                     
                     {/* Highly aesthetic hero image overlay */}
                     <div 
-                        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.16] pointer-events-none mix-blend-color-dodge z-0"
+                        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.40] pointer-events-none mix-blend-color-dodge z-0"
                         style={{ backgroundImage: "url('/code-design-creative-wallpaper-featuring-intricate-patterns-computer-code-technology-art-to-offer-modern-code-design-355060656.webp')" }}
                     />
                     
@@ -96,7 +96,7 @@ export default function LandingPage() {
             {/* Footer */}
             <footer className="py-8 border-t border-slate-800 bg-slate-950 text-center relative z-20">
                 <p className="text-slate-500 text-sm">
-                    &copy; {new Date().getFullYear()} CodeQuest. All rights reserved.
+                    &copy; {new Date().getFullYear()} CodeQuest Academy. All rights reserved.
                 </p>
             </footer>
         </div>

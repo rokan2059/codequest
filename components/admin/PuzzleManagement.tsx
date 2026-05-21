@@ -109,50 +109,28 @@ const PuzzleManagement: React.FC = () => {
                 <div className="bg-gray-800/50 backdrop-blur-md rounded-xl p-6 border border-gray-700 self-start">
                     <h2 className="text-2xl font-semibold mb-4">{editingPuzzle ? 'Edit Puzzle' : 'Add New Puzzle'}</h2>
                     <form onSubmit={handleSubmit} className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">Puzzle Title</label>
-                            <input name="title" value={formState.title} onChange={handleInputChange} placeholder="Puzzle Title" className="w-full p-2 bg-gray-900 border border-gray-700 rounded focus:border-blue-500 focus:outline-none" required />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">Puzzle Category</label>
-                            <select name="category" value={formState.category} onChange={handleInputChange} className="w-full p-2 bg-gray-900 border border-gray-700 rounded" required>
-                                {puzzleCategories.length === 0 ? (
-                                    <option disabled value="">Create a category first</option>
-                                ) : (
-                                    puzzleCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)
-                                )}
+                        <p>Puzzle Title</p>
+                        <input name="title" value={formState.title} onChange={handleInputChange} placeholder="Puzzle Title" className="w-full p-2 bg-gray-900 border border-gray-700 rounded" required />
+                        <p>Puzzle Category</p>
+                        <select name="category" value={formState.category} onChange={handleInputChange} className="w-full p-2 bg-gray-900 border border-gray-700 rounded" required>
+                            {puzzleCategories.length === 0 ? (
+                                <option disabled value="">Create a category first</option>
+                            ) : (
+                                puzzleCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)
+                            )}
+                        </select>
+
+                        <textarea name="description" value={formState.description} onChange={handleInputChange} placeholder="Description" className="w-full p-2 bg-gray-900 border border-gray-700 rounded" rows={2}></textarea>
+                        <textarea name="code" value={formState.code} onChange={handleInputChange} placeholder="Code Snippet" className="w-full p-2 bg-gray-900 border border-gray-700 rounded font-mono" rows={5} required></textarea>
+                        <textarea name="answer" value={formState.answer} onChange={handleInputChange} placeholder="Correct Answer" className="w-full p-2 bg-gray-900 border border-gray-700 rounded font-mono" rows={2} required></textarea>
+                        <p>Difficulty</p>
+                        <div className="flex gap-4">
+                            <select name="difficulty" value={formState.difficulty} onChange={handleInputChange} className="w-full p-2 bg-gray-900 border border-gray-700 rounded">
+                                <option>Easy</option>
+                                <option>Medium</option>
+                                <option>Hard</option>
                             </select>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-400 mb-1">Description</label>
-                            <textarea name="description" value={formState.description} onChange={handleInputChange} placeholder="Description" className="w-full p-2 bg-gray-900 border border-gray-700 rounded focus:border-blue-500 focus:outline-none" rows={2}></textarea>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-400 mb-1">Code Snippet</label>
-                            <textarea name="code" value={formState.code} onChange={handleInputChange} placeholder="Code Snippet" className="w-full p-2 bg-gray-900 border border-gray-700 rounded font-mono focus:border-blue-500 focus:outline-none" rows={5} required></textarea>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-400 mb-1">Correct Answer</label>
-                            <textarea name="answer" value={formState.answer} onChange={handleInputChange} placeholder="Correct Answer" className="w-full p-2 bg-gray-900 border border-gray-700 rounded font-mono focus:border-blue-500 focus:outline-none" rows={2} required></textarea>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-400 mb-1 font-semibold text-gray-300">Difficulty</label>
-                                <select name="difficulty" value={formState.difficulty} onChange={handleInputChange} className="w-full p-2 bg-gray-900 border border-gray-700 rounded focus:border-blue-500 focus:outline-none">
-                                    <option>Easy</option>
-                                    <option>Medium</option>
-                                    <option>Hard</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-400 mb-1 font-semibold text-gray-300">Required Level</label>
-                                <input type="number" name="requiredLevel" value={formState.requiredLevel} onChange={handleInputChange} placeholder="Required level to unlock" className="w-full p-2 bg-gray-900 border border-gray-700 rounded focus:border-blue-500 focus:outline-none" required/>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-400 mb-1">Points</label>
                                 <input type="number" name="points" value={formState.points} onChange={handleInputChange} placeholder="10" className="w-full p-2 bg-gray-900 border border-gray-700 rounded focus:border-blue-500 focus:outline-none" required/>
@@ -161,6 +139,8 @@ const PuzzleManagement: React.FC = () => {
                                 <label className="block text-sm font-medium text-gray-400 mb-1">XP</label>
                                 <input type="number" name="xp" value={formState.xp} onChange={handleInputChange} placeholder="150" className="w-full p-2 bg-gray-900 border border-gray-700 rounded focus:border-blue-500 focus:outline-none" required/>
                             </div>
+                        </div>
+                                <input type="number" name="requiredLevel" value={formState.requiredLevel} onChange={handleInputChange} placeholder="Req Level" className="w-full p-2 bg-gray-900 border border-gray-700 rounded" required/>
                         </div>
                         <div className="flex gap-2">
                              <button type="submit" className="flex-grow bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">

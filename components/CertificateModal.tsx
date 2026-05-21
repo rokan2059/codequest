@@ -14,7 +14,7 @@ interface CertificateModalProps {
 
 const CertificateModal: React.FC<CertificateModalProps> = ({ user: propUser, onClose }) => {
     const certificateRef = useRef<HTMLDivElement>(null);
-    const { state, dispatch, addToast } = useAppContext();
+    const { state, dispatch } = useAppContext();
     const { certificateRequirements } = state;
     
     // Always use the latest user data from state if it's the current user
@@ -63,7 +63,7 @@ const CertificateModal: React.FC<CertificateModalProps> = ({ user: propUser, onC
             pdf.save(`CodeQuest-Certificate-${name.replace(/\s+/g, '-')}.pdf`);
         } catch (error) {
             console.error('Error generating PDF:', error);
-            addToast("Failed to generate PDF. You can also try right-clicking the certificate to save.", "error");
+            alert("Failed to generate PDF. You can also try right-clicking the certificate to save it as an image.");
         } finally {
             setIsGeneratingPdf(false);
         }
@@ -95,7 +95,7 @@ const CertificateModal: React.FC<CertificateModalProps> = ({ user: propUser, onC
                 setNameSubmitted(true);
             } catch (err) {
                 console.error(err);
-                addToast("Failed to save certificate. Make sure the database schema is updated.", "error");
+                alert("Failed to save certificate. Make sure the database schema is updated.");
             } finally {
                 setIsSaving(false);
             }
