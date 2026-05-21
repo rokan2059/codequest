@@ -1,5 +1,6 @@
 {
   "name": "CodeQuest",
   "description": "A coding puzzle game to test and improve your programming skills.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

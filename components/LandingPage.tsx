@@ -96,7 +96,7 @@ export default function LandingPage() {
             {/* Footer */}
             <footer className="py-8 border-t border-slate-800 bg-slate-950 text-center relative z-20">
                 <p className="text-slate-500 text-sm">
-                    &copy; {new Date().getFullYear()} CodeQuest Academy. All rights reserved.
+                    &copy; {new Date().getFullYear()} CodeQuest. All rights reserved.
                 </p>
             </footer>
         </div>

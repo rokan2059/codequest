@@ -79,6 +79,9 @@ const PuzzleView: React.FC<PuzzleViewProps> = ({ puzzle }) => {
                             <span className="text-sm font-bold text-yellow-400">◈ {puzzle.points} Points</span>
                             <span className="text-sm font-bold text-blue-400">⚡ {puzzle.xp} XP</span>
                         </div>
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                            Required Level: {requiredLevel}
+                        </span>
                     </div>
                 </div>
             </header>
@@ -92,13 +95,26 @@ const PuzzleView: React.FC<PuzzleViewProps> = ({ puzzle }) => {
                     </div>
                 )}
                 
-                <p className="text-gray-300 text-lg mb-6">{puzzle.description}</p>
-
-                <div className="bg-background rounded-lg font-mono text-sm border border-primary mb-6 overflow-x-auto">
-                    <SyntaxHighlighter language="javascript" style={vscDarkPlus} customStyle={{ margin: 0, padding: '1rem', background: 'transparent' }}>
-                        {puzzle.code}
-                    </SyntaxHighlighter>
+                <div className="mb-6">
+                    <h2 className="text-xs font-semibold text-sky-400 uppercase tracking-widest mb-2">Description</h2>
+                    <p className="text-gray-300 text-lg leading-relaxed">{puzzle.description}</p>
                 </div>
+
+                <div className="mb-6">
+                    <h2 className="text-xs font-semibold text-sky-400 uppercase tracking-widest mb-2">Code Snippet</h2>
+                    <div className="bg-background rounded-lg font-mono text-sm border border-primary overflow-x-auto">
+                        <SyntaxHighlighter language="javascript" style={vscDarkPlus} customStyle={{ margin: 0, padding: '1rem', background: 'transparent' }}>
+                            {puzzle.code}
+                        </SyntaxHighlighter>
+                    </div>
+                </div>
+
+                {(isAlreadySolved || isCorrect === true) && (
+                    <div className="mb-6 p-4 rounded-lg border border-green-800/40 bg-green-950/20 text-green-200">
+                        <span className="text-xs font-bold uppercase tracking-widest text-green-400 block mb-1">Correct Answer</span>
+                        <code className="text-sm font-mono block bg-black/40 p-2.5 rounded border border-green-900/30 w-fit">{puzzle.answer}</code>
+                    </div>
+                )}
 
                 {isLocked ? (
                     <div className="mt-6 p-4 rounded-lg bg-neutral-900 border border-primary text-center">

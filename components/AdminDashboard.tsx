@@ -60,7 +60,7 @@ const AdminDashboard: React.FC = () => {
                 <div className="bg-slate-800/50 backdrop-blur-md rounded-xl p-6 border border-slate-700 hover:border-sky-500 transition-colors duration-300">
                     <div className="flex items-center gap-4 mb-4">
                         <PuzzleIcon className="w-8 h-8 text-sky-400" />
-                        <h2 className="text-xl font-semibold text-slate-100">Coding Challenges</h2>
+                        <h2 className="text-xl font-semibold text-slate-100">Puzzle Management</h2>
                     </div>
                     <p className="text-slate-400 mb-4">
                         Create, edit, and delete coding challenges. Organize them into categories and set difficulty levels.

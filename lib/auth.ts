@@ -162,68 +162,114 @@ export const logout = async () => {
     await supabase.auth.signOut();
 };
 
+const clearSupabaseKeys = () => {
+    if (typeof window === 'undefined') return;
+    try {
+        localStorage.removeItem('supabase.auth.token');
+        const keysToRemove: string[] = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && (key.startsWith('sb-') || key.includes('supabase') || key.includes('auth-token'))) {
+                keysToRemove.push(key);
+            }
+        }
+        keysToRemove.forEach(k => {
+            try {
+                localStorage.removeItem(k);
+            } catch (e) {}
+        });
+    } catch (e) {
+        console.error('Failed to clear Supabase localStorage keys:', e);
+    }
+};
+
 export const getLoggedInUser = async (): Promise<User | null> => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return null;
-
-    let { data: profile, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', session.user.id)
-        .single();
-
-    if (error || !profile) {
-        console.warn('Profile missing for user, attempting to create one...', session.user.id);
-        // Fallback: If profile doesn't exist, try to create it (logic from trigger)
-        const { data: newProfile, error: insertError } = await supabase
-            .from('profiles')
-            .insert([{ 
-                id: session.user.id, 
-                email: session.user.email,
-                username: session.user.user_metadata?.username,
-                role: 'player'
-            }])
-            .select()
-            .single();
+    try {
+        const { data, error } = await supabase.auth.getSession();
         
-        if (insertError) {
-            console.error('Failed to create fallback profile:', insertError);
+        if (error) {
+            console.warn('getLoggedInUser: Error getting supabase session, cleaning up:', error);
+            // If the error message indicates issues with Refresh Token or Invalid Grant, purge localStorage keys to stop repetitive errors on page refresh
+            if (
+                error.message?.toLowerCase().includes('refresh token') || 
+                error.message?.toLowerCase().includes('invalid') || 
+                error.message?.toLowerCase().includes('grant') ||
+                error.status === 400 || 
+                error.status === 401
+            ) {
+                try {
+                    await supabase.auth.signOut().catch(() => {});
+                } catch (e) {}
+                clearSupabaseKeys();
+            }
             return null;
         }
-        profile = newProfile;
-    } else if (!profile.username && session.user.user_metadata?.username) {
-        // Sync username if missing in profile but present in metadata
-        const { data: updatedProfile } = await supabase
+
+        const session = data?.session;
+        if (!session) return null;
+
+        let { data: profile, error: profileError } = await supabase
             .from('profiles')
-            .update({ username: session.user.user_metadata.username })
+            .select('*')
             .eq('id', session.user.id)
-            .select()
             .single();
-        if (updatedProfile) {
-            profile = updatedProfile;
+
+        if (profileError || !profile) {
+            console.warn('Profile missing for user, attempting to create one...', session.user.id);
+            // Fallback: If profile doesn't exist, try to create it (logic from trigger)
+            const { data: newProfile, error: insertError } = await supabase
+                .from('profiles')
+                .insert([{ 
+                    id: session.user.id, 
+                    email: session.user.email,
+                    username: session.user.user_metadata?.username,
+                    role: 'player'
+                }])
+                .select()
+                .single();
+            
+            if (insertError) {
+                console.error('Failed to create fallback profile:', insertError);
+                return null;
+            }
+            profile = newProfile;
+        } else if (!profile.username && session.user.user_metadata?.username) {
+            // Sync username if missing in profile but present in metadata
+            const { data: updatedProfile } = await supabase
+                .from('profiles')
+                .update({ username: session.user.user_metadata.username })
+                .eq('id', session.user.id)
+                .select()
+                .single();
+            if (updatedProfile) {
+                profile = updatedProfile;
+            }
         }
+
+        const levelInfo = calculateLevel(calculateTotalXp(profile.level || 1, profile.xp || 0));
+
+        return {
+            id: profile.id,
+            email: profile.email,
+            role: profile.role,
+            points: profile.points || 0,
+            xp: profile.xp || 0,
+            level: profile.level || 1,
+            xpToNextLevel: levelInfo.xpToNextLevel,
+            solvedPuzzleIds: profile.solved_puzzle_ids || [],
+            achievements: profile.achievement_ids || [],
+            username: profile.username,
+            username_changes: profile.username_changes || 0,
+            avatarUrl: profile.avatar_url,
+            created_at: profile.created_at,
+            certificate_id: profile.certificate_id,
+            certificate_name: profile.certificate_name,
+            certificate_issued_at: profile.certificate_issued_at
+        };
+    } catch (e) {
+        console.error('Error in getLoggedInUser:', e);
+        return null;
     }
-
-    const levelInfo = calculateLevel(calculateTotalXp(profile.level || 1, profile.xp || 0));
-
-    return {
-        id: profile.id,
-        email: profile.email,
-        role: profile.role,
-        points: profile.points || 0,
-        xp: profile.xp || 0,
-        level: profile.level || 1,
-        xpToNextLevel: levelInfo.xpToNextLevel,
-        solvedPuzzleIds: profile.solved_puzzle_ids || [],
-        achievements: profile.achievement_ids || [],
-        username: profile.username,
-        username_changes: profile.username_changes || 0,
-        avatarUrl: profile.avatar_url,
-        created_at: profile.created_at,
-        certificate_id: profile.certificate_id,
-        certificate_name: profile.certificate_name,
-        certificate_issued_at: profile.certificate_issued_at
-    };
 };
 
 export const updateUser = async (updatedUser: User) => {
